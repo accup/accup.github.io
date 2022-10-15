@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Extract Node version
+        run: |
+          echo "node_version=`cat .node-version | sed -r '/^\s*$/d;s/^\s*|\s*$//g'`" >> $GITHUB_ENV
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.node_version }}
+      - name: Install packages
+        run: npm ci
+      - name: Lint codes
+        run: npm run lint
+      - name: Build to check
+        run: npm run build
