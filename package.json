@@ -1,4 +1,5 @@
 {
+  "name": "accup.github.io",
   "private": true,
   "license": "MIT",
   "scripts": {
@@ -11,6 +12,8 @@
     "fix": "npm run lint:eslint -- --fix && npm run lint:prettier -- --write"
   },
   "dependencies": {
+    "@vanilla-extract/css": "^1.9.1",
+    "@vanilla-extract/vite-plugin": "^3.6.1",
     "@vitejs/plugin-vue": "^3.1.2",
     "typescript": "^4.8.4",
     "vite": "^3.1.8",

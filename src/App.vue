@@ -1,3 +1,10 @@
+<script setup lang="ts">
+import SearchParamsContext from "./components/contexts/SearchParamsContext.vue";
+import MainAllotter from "./components/allotters/MainAllotter.vue";
+</script>
+
 <template>
-  <main>UNDER CONSTRUCTION...</main>
+  <SearchParamsContext>
+    <MainAllotter />
+  </SearchParamsContext>
 </template>
