@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { watchEffect } from "vue";
-import { useSearchParams } from "../contexts/SearchParamsContext.vue";
+import { injectMainSearchParams } from "../contexts/MainContext.vue";
 import UnderConstruction from "../contents/main/UnderConstruction.vue";
 
-const params = useSearchParams(["under"] as const);
+const params = injectMainSearchParams();
 
 watchEffect(() => {
   if (params.under.value !== "construction") {

@@ -3,23 +3,32 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, provide, inject, ref } from "vue";
+import {
+  defineComponent,
+  computed,
+  provide,
+  inject,
+  ref,
+  onUnmounted,
+} from "vue";
 import type { Ref } from "vue";
 import { fromEntries } from "../../utils/object";
 
 const provided = {
   search: Symbol(),
-  map: Symbol(),
+  nameSymbolMap: Symbol(),
 } as const;
 
-type ReactiveMap = Map<string, Ref<string | null>>;
+type NameSymbolMap = Map<string, symbol>;
 type RefParam = Ref<string | null>;
+type RefParamProvide = () => void;
+type RefParamInject = () => RefParam;
+type RefParamsProvide = () => void;
+type RefParamsInject<T extends readonly string[]> = () => {
+  [K in T[number]]: RefParam;
+};
 
-function newRefParam(
-  search: URLSearchParams,
-  map: ReactiveMap,
-  name: string
-): RefParam {
+function newRefParam(search: URLSearchParams, name: string): RefParam {
   const url = new URL(location.href);
   const refValue = ref<string | null>(search.get(name));
   const refParam = computed<string | null>({
@@ -37,41 +46,99 @@ function newRefParam(
       history.replaceState(null, "", url);
     },
   });
-  map.set(name, refParam);
   return refParam;
-}
-
-function useRefParam(
-  search: URLSearchParams,
-  map: ReactiveMap,
-  name: string
-): RefParam {
-  return map.get(name) ?? newRefParam(search, map, name);
 }
 
 function prepare() {
   const search = new URLSearchParams(location.search);
-  const map = new Map<string, RefParam>();
-  provide<URLSearchParams>(provided.search, search);
-  provide<ReactiveMap>(provided.map, map);
+  const nameSymbolMap: NameSymbolMap = new Map();
+  provide(provided.search, search);
+  provide(provided.nameSymbolMap, nameSymbolMap);
 }
 
-export function useSearchParam(name: string): RefParam {
-  const search = inject<URLSearchParams>(provided.search);
-  const map = inject<ReactiveMap>(provided.map);
-  if (search == null || map == null) {
-    throw new Error(`Not prepared`);
+function injectNameSymbolMap(): NameSymbolMap {
+  const nameSymbolMap = inject<NameSymbolMap>(provided.nameSymbolMap);
+  if (nameSymbolMap == null) {
+    throw new Error(`Search params not prepared`);
   }
-
-  return useRefParam(search, map, name);
+  return nameSymbolMap;
 }
 
-export function useSearchParams<T extends readonly string[]>(
+function newNameSymbol(nameSymbolMap: NameSymbolMap, name: string): symbol {
+  const nameSymbol = Symbol();
+  nameSymbolMap.set(name, nameSymbol);
+  return nameSymbol;
+}
+
+function injectBackRefParam(name: string): RefParam | undefined {
+  const nameSymbolMap = injectNameSymbolMap();
+  const nameSymbol = nameSymbolMap.get(name);
+  if (nameSymbol == null) {
+    newNameSymbol(nameSymbolMap, name);
+    return undefined;
+  } else {
+    return inject<RefParam>(nameSymbol);
+  }
+}
+
+function injectNameSymbol(name: string): symbol {
+  const nameSymbolMap = injectNameSymbolMap();
+  const nameSymbol = nameSymbolMap.get(name);
+  if (nameSymbol == null) {
+    throw new Error(`Unused search param '${name}'`);
+  }
+  return nameSymbol;
+}
+
+export function defineSearchParamProvider(
+  name: string
+): [RefParamProvide, RefParamInject] {
+  return [
+    () => {
+      const search = inject<URLSearchParams>(provided.search);
+      if (search == null) {
+        throw new Error(`Search params not prepared`);
+      }
+
+      const backRefParam = injectBackRefParam(name);
+      const refParam = newRefParam(search, name);
+      provide(injectNameSymbol(name), refParam);
+
+      onUnmounted(() => {
+        if (backRefParam == null) return;
+
+        // Restore the search param
+        const value = backRefParam.value;
+        backRefParam.value = value;
+      });
+    },
+    () => {
+      const nameSymbol = injectNameSymbol(name);
+      const refParam = inject<RefParam>(nameSymbol);
+      if (refParam == null) {
+        throw new Error(`Undefined search param '${name}'`);
+      }
+      return refParam;
+    },
+  ];
+}
+
+export function defineSearchParamsProvider<T extends readonly string[]>(
   names: T
-): { [K in T[number]]: RefParam } {
-  return fromEntries<readonly [T[number], RefParam]>(
-    names.map((name) => [name, useSearchParam(name)] as const)
+): [RefParamsProvide, RefParamsInject<T>] {
+  const paramProviderEntries = names.map(
+    (name) => [name, defineSearchParamProvider(name)] as const
   );
+  return [
+    () => paramProviderEntries.forEach(([, [provideParam]]) => provideParam()),
+    () =>
+      fromEntries<readonly [T[number], RefParam]>(
+        paramProviderEntries.map(([name, [, injectParam]]) => [
+          name,
+          injectParam(),
+        ])
+      ),
+  ];
 }
 
 export default defineComponent({
