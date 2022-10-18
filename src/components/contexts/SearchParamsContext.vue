@@ -12,7 +12,6 @@ import {
   onUnmounted,
 } from "vue";
 import type { Ref } from "vue";
-import { fromEntries } from "../../utils/object";
 
 const provided = {
   search: Symbol(),
@@ -123,20 +122,20 @@ export function defineSearchParamProvider(
   ];
 }
 
-export function defineSearchParamsProvider<T extends readonly string[]>(
-  names: T
-): [RefParamsProvide, RefParamsInject<T>] {
+export function defineSearchParamsProvider<T extends string>(
+  names: readonly T[]
+): [RefParamsProvide, RefParamsInject<T[]>] {
   const paramProviderEntries = names.map(
     (name) => [name, defineSearchParamProvider(name)] as const
   );
+
   return [
     () => paramProviderEntries.forEach(([, [provideParam]]) => provideParam()),
     () =>
-      fromEntries<readonly [T[number], RefParam]>(
-        paramProviderEntries.map(([name, [, injectParam]]) => [
-          name,
-          injectParam(),
-        ])
+      Object.fromEntries(
+        paramProviderEntries.map(
+          ([name, [, injectParam]]) => [name, injectParam()] as const
+        )
       ),
   ];
 }
