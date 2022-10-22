@@ -7,9 +7,10 @@
   "description": "Reactive search parameters for Vue.js.",
   "main": "./dist/vue-search-params.umd.cjs",
   "module": "./dist/vue-search-params.js",
-  "types": "./dist/vue-search-params.d.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/vue-search-params.js",
       "require": "./dist/vue-search-params.umd.cjs"
     }

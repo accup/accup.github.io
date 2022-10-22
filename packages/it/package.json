@@ -7,9 +7,10 @@
   "description": "Iterative operation utilities.",
   "main": "./dist/it.umd.cjs",
   "module": "./dist/it.js",
-  "types": "./dist/it.d.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/it.js",
       "require": "./dist/it.umd.cjs"
     }
