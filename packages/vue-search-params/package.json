@@ -23,6 +23,8 @@
   "homepage": "https://github.com/accup/accup.github.io#readme",
   "scripts": {
     "dev": "tsc --watch",
+    "clean": "rm -rf ./dist",
+    "prebuild": "npm run clean",
     "build": "tsc"
   },
   "devDependencies": {
