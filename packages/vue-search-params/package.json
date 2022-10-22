@@ -5,9 +5,15 @@
   "license": "MIT",
   "author": "Accup",
   "description": "Reactive search parameters for Vue.js.",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/vue-search-params.umd.cjs",
+  "module": "./dist/vue-search-params.js",
+  "types": "./dist/vue-search-params.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/vue-search-params.js",
+      "require": "./dist/vue-search-params.umd.cjs"
+    }
+  },
   "files": [
     "LICENSE",
     "README.md",
@@ -22,12 +28,12 @@
   },
   "homepage": "https://github.com/accup/accup.github.io#readme",
   "scripts": {
-    "dev": "tsc --watch",
-    "clean": "rm -rf ./dist",
-    "prebuild": "npm run clean",
-    "build": "tsc"
+    "dev": "vite build --watch",
+    "build": "vite build"
   },
   "devDependencies": {
-    "typescript": "^4.8.4"
+    "@rollup/plugin-typescript": "^9.0.2",
+    "@types/node": "^18.11.3",
+    "vite": "^3.1.8"
   }
 }

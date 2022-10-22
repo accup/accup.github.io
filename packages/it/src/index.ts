@@ -1,1 +1,1 @@
-export const hello = "world";
+export { entries, fromEntries } from "./object";
