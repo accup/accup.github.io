@@ -1,23 +1,16 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "useDefineForClassFields": true,
     "module": "ESNext",
     "moduleResolution": "Node",
     "strict": true,
     "jsx": "preserve",
+    "declaration": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
-    "skipLibCheck": true,
-    "noEmit": true,
-    "strictNullChecks": true
-  },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    }
-  ]
+    "strictNullChecks": true,
+    "preserveWatchOutput": true
+  }
 }

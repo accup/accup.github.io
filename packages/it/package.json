@@ -1,0 +1,31 @@
+{
+  "name": "@accup/it",
+  "version": "0.0.0",
+  "type": "module",
+  "license": "MIT",
+  "author": "Accup",
+  "description": "Iterative operation utilities.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/accup/accup.github.io.git"
+  },
+  "bugs": {
+    "url": "https://github.com/accup/accup.github.io/issues"
+  },
+  "homepage": "https://github.com/accup/accup.github.io#readme",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.4"
+  }
+}
