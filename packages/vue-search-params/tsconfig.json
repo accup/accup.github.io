@@ -1,8 +1,8 @@
 {
+  "extends": "../../tsconfig.workspace.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist"
   },
-  "extends": "../../tsconfig.workspace.json",
   "include": ["**/*.ts", "**/*.d.ts", "**/*.tsx", "**/*.vue"]
 }
