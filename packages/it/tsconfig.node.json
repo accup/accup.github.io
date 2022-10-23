@@ -1,4 +1,9 @@
 {
   "extends": "../../tsconfig.node.json",
-  "include": ["vite.config.ts"]
+  "include": [
+    "package.json",
+    "rollup.config.ts",
+    "rollup-ts.config.ts",
+    "rollup-dts.config.ts"
+  ]
 }

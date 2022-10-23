@@ -5,7 +5,6 @@
     "moduleResolution": "Node",
     "strict": true,
     "jsx": "preserve",
-    "declaration": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,

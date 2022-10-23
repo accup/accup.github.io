@@ -7,10 +7,10 @@
   "description": "Iterative operation utilities.",
   "main": "./dist/it.umd.cjs",
   "module": "./dist/it.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/it.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/it.d.ts",
       "import": "./dist/it.js",
       "require": "./dist/it.umd.cjs"
     }
@@ -29,13 +29,13 @@
   },
   "homepage": "https://github.com/accup/accup.github.io#readme",
   "scripts": {
-    "dev": "vite build --watch",
-    "build": "tsc --noEmit && vite build"
-  },
-  "devDependencies": {
-    "@rollup/plugin-typescript": "^9.0.2",
-    "@types/node": "^18.11.3",
-    "typescript": "^4.8.4",
-    "vite": "^3.1.8"
+    "dev": "concurrently \"npm:dev:*\"",
+    "dev:js": "npm run build:js -- --watch",
+    "dev:ts": "npm run build:ts -- --watch",
+    "dev:dts": "npm run build:dts -- --watch",
+    "build": "npm run build:js && npm run build:ts && npm run build:dts",
+    "build:js": "rollup --config rollup.config.ts --configPlugin typescript",
+    "build:ts": "rollup --config rollup-ts.config.ts --configPlugin typescript",
+    "build:dts": "rollup --config rollup-dts.config.ts --configPlugin typescript"
   }
 }
