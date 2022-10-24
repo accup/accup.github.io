@@ -30,8 +30,7 @@
   },
   "homepage": "https://github.com/accup/accup.github.io#readme",
   "scripts": {
-    "dev": "vite build --watch",
-    "build": "vite build"
+    "build:sole": "vite build"
   },
   "peerDependencies": {
     "vite": "^3",

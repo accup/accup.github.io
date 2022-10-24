@@ -6,9 +6,9 @@
   "author": "Accup",
   "scripts": {
     "dev": "node ./bin/dev.js",
-    "build": "npm run build --workspaces && npm run build:self",
-    "dev:self": "vite",
-    "build:self": "vue-tsc --noEmit && vite build",
+    "build": "npm run build --workspaces --if-present && npm run build:sole",
+    "dev:sole": "vite",
+    "build:sole": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint:eslint": "eslint . --ignore-path .gitignore",
     "lint:prettier": "prettier . --ignore-path .gitignore",

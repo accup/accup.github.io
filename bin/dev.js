@@ -17,7 +17,7 @@ const namesPackage = (
 
 concurrently([
   {
-    command: `npm run dev:self`,
+    command: `npm run dev:sole`,
     name: "dev",
   },
   ...namesPackage.map((name) => ({
