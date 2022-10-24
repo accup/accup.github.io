@@ -13,7 +13,7 @@ export default defineConfig({
       formats: ["es", "cjs"],
     },
     rollupOptions: {
-      external: ["vite", "typescript", "node:path"],
+      external: ["vite", "typescript", "node:fs", "node:path"],
     },
   },
 });
