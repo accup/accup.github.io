@@ -37,7 +37,10 @@ export default (pluginOptions: PluginOptions = null): Plugin => {
         {},
         config.compilerOptions,
         declarationCompilerOptions,
-        pluginOptions.compilerOptions
+        {
+          declarationDir: path.resolve(outDir, "types"),
+        },
+        pluginOptions?.compilerOptions
       );
       const { options, errors: configFileParsingDiagnostics } =
         ts.parseJsonConfigFileContent(config, ts.sys, currentDir);

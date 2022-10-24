@@ -1,15 +1,9 @@
 import { defineConfig } from "vite";
 import path from "node:path";
-import tsc from "./src/index";
+import emitDts from "./src/index";
 
 export default defineConfig({
-  plugins: [
-    tsc({
-      compilerOptions: {
-        declarationDir: "dist/types",
-      },
-    }),
-  ],
+  plugins: [emitDts()],
   build: {
     outDir: "dist",
     lib: {
