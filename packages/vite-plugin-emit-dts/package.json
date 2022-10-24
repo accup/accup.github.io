@@ -1,0 +1,40 @@
+{
+  "name": "@accup/vite-plugin-emit-dts",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "license": "MIT",
+  "author": "Accup",
+  "description": "Generate .d.ts files in the vite build process.",
+  "main": "./dist/vite-plugin-emit-dts.umd.cjs",
+  "module": "./dist/vite-plugin-emit-dts.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/vite-plugin-emit-dts.js",
+      "require": "./dist/vite-plugin-emit-dts.umd.cjs"
+    }
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/accup/accup.github.io.git"
+  },
+  "bugs": {
+    "url": "https://github.com/accup/accup.github.io/issues"
+  },
+  "homepage": "https://github.com/accup/accup.github.io#readme",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build"
+  },
+  "peerDependencies": {
+    "vite": "^3",
+    "typescript": ">=1.6"
+  }
+}
