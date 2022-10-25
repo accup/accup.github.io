@@ -7,10 +7,10 @@
   "description": "Iterative operation utilities.",
   "main": "./dist/it.umd.cjs",
   "module": "./dist/it.js",
-  "types": "./dist/types/index.d.ts",
+  "types": "./dist/it.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/it.d.ts",
       "import": "./dist/it.js",
       "require": "./dist/it.umd.cjs"
     }
@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/accup/accup.github.io#readme",
   "scripts": {
-    "dev": "vite build --watch",
+    "dev": "vite build --watch --mode development",
     "build": "vite build"
   }
 }

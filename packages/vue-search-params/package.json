@@ -7,10 +7,10 @@
   "description": "Reactive search parameters for Vue.js.",
   "main": "./dist/vue-search-params.umd.cjs",
   "module": "./dist/vue-search-params.js",
-  "types": "./dist/types/index.d.ts",
+  "types": "./dist/vue-search-params.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/vue-search-params.d.ts",
       "import": "./dist/vue-search-params.js",
       "require": "./dist/vue-search-params.umd.cjs"
     }
@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/accup/accup.github.io#readme",
   "scripts": {
-    "dev": "vite build --watch",
+    "dev": "vite build --watch --mode development",
     "build": "vite build"
   }
 }
