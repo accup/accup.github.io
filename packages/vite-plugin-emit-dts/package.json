@@ -32,6 +32,9 @@
   "scripts": {
     "build:sole": "vite build"
   },
+  "dependencies": {
+    "@microsoft/api-extractor": "^7.33.4"
+  },
   "peerDependencies": {
     "vite": "^3",
     "typescript": ">=1.6"
