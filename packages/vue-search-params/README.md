@@ -1,1 +1,0 @@
-# @accup/vue-search-params
