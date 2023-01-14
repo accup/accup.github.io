@@ -12,7 +12,6 @@ import {
   onUnmounted,
 } from "vue";
 import type { Ref } from "vue";
-import { fromEntries } from "@accup/it";
 
 const provided = {
   search: Symbol(),
@@ -132,12 +131,12 @@ export function defineSearchParamsProvider<T extends string>(
 
   return [
     () => paramProviderEntries.forEach(([, [provideParam]]) => provideParam()),
-    () =>
-      fromEntries(
+    (() =>
+      Object.fromEntries(
         paramProviderEntries.map(
           ([name, [, injectParam]]) => [name, injectParam()] as const
         )
-      ),
+      )) as RefParamsInject<T[]>,
   ];
 }
 
