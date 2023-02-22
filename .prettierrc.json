@@ -5,6 +5,25 @@
       "options": {
         "printWidth": 1000
       }
+    },
+    {
+      "files": ["src/**/*.ts", "src/**/*.vue"],
+      "options": {
+        "importOrderSeparation": true,
+        "importOrderSortSpecifiers": true,
+        "importOrderGroupNamespaceSpecifiers": true,
+        "importOrder": [
+          "[.]value[.]",
+          "[.]store[.]",
+          "[.]container[.]",
+          "[.]route[.]",
+          "[.]presentation[.]",
+          "^(?:(?:[.][.]/)+)(.*)(?<![.]css)$",
+          "^(?:[.]/)(.*)(?<![.]css)$",
+          "^(?:(?:[.][.]/)+)(.*)[.]css$",
+          "^(?:[.]/)(.*)[.]css$"
+        ]
+      }
     }
   ]
 }

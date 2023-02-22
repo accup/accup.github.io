@@ -1,13 +1,7 @@
 <script setup lang="ts">
-import SearchParamsContext from "./components/contexts/SearchParamsContext.vue";
-import MainContext from "./components/contexts/MainContext.vue";
-import MainAllotter from "./components/allotters/MainAllotter.vue";
+import { appStyle } from "./App.css";
 </script>
 
 <template>
-  <SearchParamsContext>
-    <MainContext>
-      <MainAllotter />
-    </MainContext>
-  </SearchParamsContext>
+  <div :class="appStyle"></div>
 </template>
