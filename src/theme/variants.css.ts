@@ -1,4 +1,3 @@
-import { style } from "@vanilla-extract/css";
 import { createSprinkles, defineProperties } from "@vanilla-extract/sprinkles";
 
 export const fontSprinkles = createSprinkles(

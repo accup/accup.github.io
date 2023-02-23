@@ -1,6 +1,6 @@
 import { globalStyle } from "@vanilla-extract/css";
 
-import { recipes } from "./presentations/recipes.css";
+import { recipes } from "./theme/recipes.css";
 
 globalStyle("html, body", {
   margin: 0,
