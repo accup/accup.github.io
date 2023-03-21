@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { appStyle } from "./App.css";
+import { app } from "./App.css";
 </script>
 
 <template>
-  <div :class="appStyle"></div>
+  <div :class="app"></div>
 </template>
