@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { app } from "./App.css";
+import PlanetMenuPresentation from "./presentations/planet-menu/PlanetMenuPresentation.vue";
+
+import { appRoot } from "./App.css";
 </script>
 
 <template>
-  <div :class="app"></div>
+  <div :class="appRoot">
+    <PlanetMenuPresentation />
+  </div>
 </template>

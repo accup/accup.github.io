@@ -19,31 +19,13 @@
   },
   "plugins": ["vue", "@typescript-eslint"],
   "rules": {
-    "@typescript-eslint/consistent-type-imports": "error",
     "import/no-restricted-paths": [
       "error",
       {
         "zones": [
           {
-            "from": "./src/**/*.route.*",
-            "target": [
-              "./src/**/*.container.*",
-              "./src/**/*.presentation.*",
-              "./src/**/*.store.*",
-              "./src/**/*.value.*"
-            ]
-          },
-          {
-            "from": "./src/**/*.container.*",
-            "target": [
-              "./src/**/*.presentation.*",
-              "./src/**/*.store.*",
-              "./src/**/*.value.*"
-            ]
-          },
-          {
-            "from": "./src/**/*.store.*",
-            "target": ["./src/**/*.container.*", "./src/**/*.value.*"]
+            "from": "./src/presentations/**/*",
+            "target": ["./src/features/**/*", "./src/hierarchies/**/*"]
           }
         ]
       }
