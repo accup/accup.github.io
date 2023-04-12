@@ -8,5 +8,6 @@ import PlanetMenuItemMercury from "./@components/PlanetMenuItemMercury.vue";
     <template #item-mercury>
       <PlanetMenuItemMercury />
     </template>
+    <template #item-venus>Venus</template>
   </PlanetMenu>
 </template>

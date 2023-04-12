@@ -1,20 +1,15 @@
 import { style } from "@vanilla-extract/css";
 
 import { recipes } from "../../../themes/recipes.css";
-import { fontSprinkles } from "../../../themes/variants.css";
 
-export const planetMenuItemMercuryListItem = style([
+export const listItem = style([
   {
-    position: "absolute",
-    left: 60,
-    top: 30,
-    width: 560,
-    height: 240,
+    display: "flow-root",
+    isolation: "isolate",
   },
 ]);
 
-export const planetMenuItemMercuryButton = style([
-  recipes({ font: "noto-04" }),
+export const button = style([
   {
     display: "block",
     position: "absolute",
@@ -25,32 +20,17 @@ export const planetMenuItemMercuryButton = style([
   },
 ]);
 
-export const planetMenuItemMercurySvg = style([
-  {
-    position: "absolute",
-    inset: 0,
-    margin: "auto",
-    width: "100%",
-    height: "100%",
-  },
-]);
-
-export const planetMenuItemMercurySvgText = style([
-  fontSprinkles({
-    fontWeight: "bold",
+export const text = style([
+  recipes({
+    font: "sans-01",
+    text: "text-04",
   }),
   {
-    textAnchor: "middle",
-    transform: "skewX(-10deg)",
     fontSize: 50,
-    fill: "#8df",
-    stroke: "#49b",
-    strokeWidth: 4,
-    paintOrder: "stroke",
   },
 ]);
 
-export const planetMenuItemMercuryCanvas = style([
+export const canvas = style([
   {
     display: "block",
     position: "absolute",

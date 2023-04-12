@@ -4,7 +4,7 @@ export const fontSprinkles = createSprinkles(
   defineProperties({
     properties: {
       fontFamily: {
-        noto: "'Noto Sans JP', monospace",
+        sans: "'Noto Sans JP', monospace",
       },
       fontWeight: {
         thin: 100,
@@ -35,10 +35,10 @@ export const fontSprinkles = createSprinkles(
 );
 
 const colorVariants = {
-  "mono-01": "#000000",
-  "mono-02": "#595959",
-  "mono-03": "#D6D6D6",
-  "mono-04": "#FFFFFF",
+  "text-01": "#000000",
+  "text-02": "#595959",
+  "text-03": "#D6D6D6",
+  "text-04": "#FFFFFF",
   "link-01": "#0017E9",
   "error-01": "#FF2929",
   "success-01": "#26CF2D",
