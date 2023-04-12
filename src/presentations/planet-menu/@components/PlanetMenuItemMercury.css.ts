@@ -2,17 +2,13 @@ import { style } from "@vanilla-extract/css";
 
 import { recipes } from "../../../themes/recipes.css";
 
-export const listItem = style([
+export const button = style([
   recipes({
     component: "root",
   }),
-]);
-
-export const button = style([
   {
-    display: "block",
-    position: "absolute",
-    inset: 0,
+    margin: 0,
+    padding: 0,
     border: "none",
     background: "none",
     cursor: "pointer",

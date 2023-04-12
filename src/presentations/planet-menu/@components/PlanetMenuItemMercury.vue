@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { button, canvas, listItem, text } from "./PlanetMenuItemMercury.css";
+import * as styles from "./PlanetMenuItemMercury.css";
 </script>
 
 <template>
-  <li :class="listItem">
-    <button type="button" :class="button">
-      <span :class="text">Mercury</span>
-      <canvas :class="canvas" />
-    </button>
-  </li>
+  <button type="button" :class="styles.button">
+    <span :class="styles.text">Mercury</span>
+    <canvas :class="styles.canvas" />
+  </button>
 </template>
