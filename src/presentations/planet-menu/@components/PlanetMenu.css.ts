@@ -1,5 +1,7 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
+import { recipes } from "../../../themes/recipes.css";
+
 export const nav = style([
   {
     position: "fixed",
@@ -22,16 +24,6 @@ export const list = style([
   },
 ]);
 
-const listItemBase = style([
-  {
-    display: "grid",
-    gridTemplateColumns: "minmax(0, 1fr)",
-    gridTemplateRows: "minmax(0, 1fr)",
-    justifyItems: "stretch",
-    alignItems: "stretch",
-  },
-]);
-
 export const listItem = styleVariants(
   {
     mercury: { left: 60, top: 30, width: 560, height: 240 },
@@ -44,7 +36,9 @@ export const listItem = styleVariants(
     neptune: {},
   },
   (rect) => [
-    listItemBase,
+    recipes({
+      grid: "stretch",
+    }),
     {
       position: "absolute",
       ...rect,

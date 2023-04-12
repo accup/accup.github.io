@@ -3,10 +3,9 @@ import { style } from "@vanilla-extract/css";
 import { recipes } from "../../../themes/recipes.css";
 
 export const listItem = style([
-  {
-    display: "flow-root",
-    isolation: "isolate",
-  },
+  recipes({
+    component: "root",
+  }),
 ]);
 
 export const button = style([

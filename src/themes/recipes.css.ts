@@ -1,3 +1,4 @@
+import { styleVariants } from "@vanilla-extract/css";
 import { recipe } from "@vanilla-extract/recipes";
 
 import { colorSprinkles, fontSprinkles } from "./variants.css";
@@ -57,6 +58,28 @@ export const recipes = recipe({
       "link-01": colorSprinkles({ backgroundColor: "link-01" }),
       "error-01": colorSprinkles({ backgroundColor: "error-01" }),
       "success-01": colorSprinkles({ backgroundColor: "success-01" }),
+    },
+    component: {
+      root: {
+        display: "flow-root",
+        isolation: "isolate",
+      },
+    },
+    grid: {
+      ...styleVariants(
+        {
+          stretch: { justifyItems: "stretch", alignItems: "stretch" },
+          center: { justifyItems: "center", alignItems: "center" },
+        },
+        (gridStyleMap) => [
+          {
+            display: "grid",
+            gridTemplateColumns: "minmax(0, 1fr)",
+            gridTemplateRows: "minmax(0, 1fr)",
+          },
+          gridStyleMap,
+        ]
+      ),
     },
   },
 });
