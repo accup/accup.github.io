@@ -64,21 +64,11 @@ export const recipes = recipe({
       } as const,
       (properties) => [colorSprinkles(properties)]
     ),
-    component: styleVariants(
-      {
-        flow: { display: "flow-root" },
-        flex: { display: "flex" },
-        grid: { display: "grid" },
-      },
-      (styleMap) => [
-        {
-          isolation: "isolate",
-        },
-        styleMap,
-      ]
-    ),
     flow: {
-      // no recipes
+      root: {
+        display: "flow-root",
+        isolation: "isolate",
+      },
     },
     flex: {
       // no recipes
@@ -92,6 +82,7 @@ export const recipes = recipe({
         },
         (styleMap) => [
           {
+            display: "grid",
             gridTemplateColumns: "minmax(0, 1fr)",
             gridTemplateRows: "minmax(0, 1fr)",
           },

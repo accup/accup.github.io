@@ -4,7 +4,7 @@ import { recipes } from "../../../themes/recipes.css";
 
 export const button = style([
   recipes({
-    component: "grid",
+    grid: "center",
   }),
   {
     margin: 0,
