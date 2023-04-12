@@ -4,7 +4,7 @@ import { recipes } from "../../../themes/recipes.css";
 
 export const nav = style([
   recipes({
-    component: "root",
+    component: "flow",
   }),
   {
     position: "fixed",
