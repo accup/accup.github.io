@@ -64,25 +64,40 @@ export const recipes = recipe({
       } as const,
       (properties) => [colorSprinkles(properties)]
     ),
-    component: styleVariants({
-      root: {
-        display: "flow-root",
-        isolation: "isolate",
-      },
-    }),
-    grid: styleVariants(
+    component: styleVariants(
       {
-        stretch: { justifyItems: "stretch", alignItems: "stretch" },
-        center: { justifyItems: "center", alignItems: "center" },
+        flow: { display: "flow-root" },
+        flex: { display: "flex" },
+        grid: { display: "grid" },
       },
       (styleMap) => [
         {
-          display: "grid",
-          gridTemplateColumns: "minmax(0, 1fr)",
-          gridTemplateRows: "minmax(0, 1fr)",
+          isolation: "isolate",
         },
         styleMap,
       ]
     ),
+    flow: {
+      // no recipes
+    },
+    flex: {
+      // no recipes
+    },
+    grid: {
+      // solo grid recipes
+      ...styleVariants(
+        {
+          stretch: { justifyItems: "stretch", alignItems: "stretch" },
+          center: { justifyItems: "center", alignItems: "center" },
+        },
+        (styleMap) => [
+          {
+            gridTemplateColumns: "minmax(0, 1fr)",
+            gridTemplateRows: "minmax(0, 1fr)",
+          },
+          styleMap,
+        ]
+      ),
+    },
   },
 });
