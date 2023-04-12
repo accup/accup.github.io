@@ -13,15 +13,10 @@
         "importOrderSortSpecifiers": true,
         "importOrderGroupNamespaceSpecifiers": true,
         "importOrder": [
-          "[.]value(?:[.]|$)",
-          "[.]store(?:[.]|$)",
-          "[.]container(?:[.]|$)",
-          "[.]route(?:[.]|$)",
-          "[.]presentation(?:[.]|$)",
-          "^(?:(?:[.][.]/)+)(.*)(?<![.]css)$",
-          "^(?:[.]/)(.*)(?<![.]css)$",
-          "^(?:(?:[.][.]/)+)(.*)[.]css$",
-          "^(?:[.]/)(.*)[.]css$"
+          "^[.][.]/.*(?<![.]css)$",
+          "^[.]/.*(?<![.]css)$",
+          "^[.][.]/.*(?<=[.]css)$",
+          "^[.]/.*(?<=[.]css)$"
         ]
       }
     }

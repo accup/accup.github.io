@@ -8,8 +8,8 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "lint:eslint": "eslint . --ignore-path .gitignore",
-    "lint:prettier": "prettier . --ignore-path .gitignore",
+    "lint:eslint": "eslint './src/**/*.{ts,vue}' --ignore-path .gitignore",
+    "lint:prettier": "prettier 'index.html' './src/**/*.{ts,vue}' --ignore-path .gitignore",
     "lint": "npm run lint:eslint && npm run lint:prettier -- --check",
     "fix": "npm run lint:eslint -- --fix && npm run lint:prettier -- --write"
   },
