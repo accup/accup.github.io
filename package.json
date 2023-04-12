@@ -19,6 +19,7 @@
     "@vanilla-extract/sprinkles": "^1.5.2",
     "@vanilla-extract/vite-plugin": "^3.8.0",
     "@vitejs/plugin-vue": "^4.1.0",
+    "three": "^0.151.3",
     "typescript": "^5.0.4",
     "vite": "^4.2.1",
     "vue": "^3.2.45",
