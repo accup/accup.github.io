@@ -6,7 +6,8 @@
   "author": "Accup",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "vite build",
+    "type-check": "vue-tsc --noEmit",
     "preview": "vite preview",
     "lint:eslint": "eslint './src/**/*.{ts,vue}' --ignore-path .gitignore",
     "lint:prettier": "prettier 'index.html' './src/**/*.{ts,vue}' --ignore-path .gitignore",
