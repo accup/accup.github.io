@@ -2,9 +2,8 @@
 import { IUniform, Mesh, RawShaderMaterial, SphereGeometry } from "three";
 
 import { useThreeAnimation } from "../../../../hooks/three/useThreeAnimation";
-
-import fragmentShader from "./PlanetMenuItemMercury.frag?raw";
-import vertexShader from "./PlanetMenuItemMercury.vert?raw";
+import fragmentShader from "../@shaders/PlanetMenuItemMercury.frag?raw";
+import vertexShader from "../@shaders/PlanetMenuItemMercury.vert?raw";
 
 import * as styles from "./PlanetMenuItemMercury.css";
 
