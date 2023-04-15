@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Scene, WebGLRenderer } from "three";
+import { PerspectiveCamera, Scene, Vector2, WebGLRenderer } from "three";
 import { ShallowRef, shallowRef, watchEffect } from "vue";
 
 import {
@@ -86,6 +86,19 @@ export function useThreeAnimation({
     setup?.({ graphics });
 
     animationLoop.set((animation) => {
+      const containerSize = refContainerSize.value;
+      const size = renderer.getSize(new Vector2());
+      if (containerSize != null) {
+        if (
+          size.width != containerSize.width ||
+          size.height != containerSize.height
+        ) {
+          camera.aspect = containerSize.width / containerSize.height;
+          camera.updateProjectionMatrix();
+          renderer.setSize(containerSize.width, containerSize.height);
+        }
+      }
+
       loop({ graphics, animation });
       renderer.render(scene, camera);
     });
@@ -117,22 +130,6 @@ export function useThreeAnimation({
     onCleanup(() => {
       container.replaceChildren();
     });
-  });
-
-  watchEffect(() => {
-    const containerSize = refContainerSize.value;
-    if (containerSize == null) {
-      return;
-    }
-
-    const graphics = refGraphics.value;
-    if (graphics == null) {
-      return;
-    }
-
-    graphics.camera.aspect = containerSize.width / containerSize.height;
-    graphics.camera.updateProjectionMatrix();
-    graphics.renderer.setSize(containerSize.width, containerSize.height);
   });
 
   return { refContainer };
