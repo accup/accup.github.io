@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import SearchParamsContext from "./components/contexts/SearchParamsContext.vue";
-import MainContext from "./components/contexts/MainContext.vue";
-import MainAllotter from "./components/allotters/MainAllotter.vue";
+import PlanetMenuContainer from "./presentations/planet-menu/PlanetMenuContainer.vue";
+
+import * as styles from "./App.css";
 </script>
 
 <template>
-  <SearchParamsContext>
-    <MainContext>
-      <MainAllotter />
-    </MainContext>
-  </SearchParamsContext>
+  <div :class="styles.root">
+    <PlanetMenuContainer />
+  </div>
 </template>

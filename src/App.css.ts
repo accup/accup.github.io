@@ -1,12 +1,13 @@
-import { globalStyle } from "@vanilla-extract/css";
-import { appVars } from "./styles/theme.css";
+import { style } from "@vanilla-extract/css";
 
-globalStyle("html, body", {
-  margin: 0,
-  padding: 0,
-});
+import { recipes } from "./themes/recipes.css";
 
-globalStyle(":root", {
-  backgroundColor: appVars.color.background,
-  fontFamily: appVars.font.default,
-});
+export const root = style([
+  recipes({
+    font: "sans-04",
+    text: "text-01",
+  }),
+  {
+    display: "flow-root",
+  },
+]);

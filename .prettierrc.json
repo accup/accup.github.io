@@ -5,6 +5,20 @@
       "options": {
         "printWidth": 1000
       }
+    },
+    {
+      "files": ["src/**/*.ts", "src/**/*.vue"],
+      "options": {
+        "importOrderSeparation": true,
+        "importOrderSortSpecifiers": true,
+        "importOrderGroupNamespaceSpecifiers": true,
+        "importOrder": [
+          "^[.][.]/.*(?<![.]css)$",
+          "^[.]/.*(?<![.]css)$",
+          "^[.][.]/.*(?<=[.]css)$",
+          "^[.]/.*(?<=[.]css)$"
+        ]
+      }
     }
   ]
 }
