@@ -3,31 +3,33 @@ import { style, styleVariants } from "@vanilla-extract/css";
 import { recipes } from "../../../themes/recipes.css";
 
 export const nav = style([
+  recipes({
+    grid: "stretch",
+  }),
   {
-    display: "flow-root",
     position: "fixed",
     inset: 0,
+    padding: 32,
     overflow: "clip",
     backgroundColor: "#000",
   },
 ]);
 
 export const list = style([
+  recipes({
+    flex: "row",
+  }),
   {
+    flexWrap: "wrap",
     listStyle: "none",
     margin: 0,
     padding: 0,
-  },
-  {
-    position: "absolute",
-    inset: 0,
-    overflow: "clip",
   },
 ]);
 
 export const listItem = styleVariants(
   {
-    mercury: { left: 60, top: 30, width: 560, height: 240 },
+    mercury: {},
     venus: {},
     earth: {},
     mars: {},
@@ -36,13 +38,16 @@ export const listItem = styleVariants(
     uranus: {},
     neptune: {},
   },
-  (rect) => [
+  (styleMap) => [
     recipes({
       grid: "stretch",
     }),
     {
-      position: "absolute",
-      ...rect,
+      flexGrow: 1,
+      flexShrink: 0,
+      flexBasis: 250,
+      height: 250,
     },
+    styleMap,
   ]
 );

@@ -14,17 +14,10 @@ export const button = style([
     background: "none",
     cursor: "pointer",
   },
-]);
-
-export const text = style([
-  recipes({
-    font: "sans-01",
-    text: "text-04",
-  }),
   {
-    gridRow: 1,
-    gridColumn: 1,
-    fontSize: 50,
+    ":focus-within": {
+      zIndex: 1,
+    },
   },
 ]);
 
@@ -37,5 +30,18 @@ export const container = style([
     gridRow: 1,
     gridColumn: 1,
     margin: -32,
+  },
+]);
+
+export const text = style([
+  recipes({
+    font: "sans-01",
+    text: "text-04",
+  }),
+  {
+    gridRow: 1,
+    gridColumn: 1,
+    fontSize: 50,
+    mixBlendMode: "overlay",
   },
 ]);

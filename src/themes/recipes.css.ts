@@ -64,16 +64,25 @@ export const recipes = recipe({
       } as const,
       (properties) => [colorSprinkles(properties)]
     ),
-    flex: {
-      // no recipes
-    },
+    flex: styleVariants(
+      {
+        row: { flexDirection: "row" },
+        column: { flexDirection: "column" },
+      } as const,
+      (styleMap) => [
+        {
+          display: "flex",
+        },
+        styleMap,
+      ]
+    ),
     grid: {
       // solo grid recipes
       ...styleVariants(
         {
           stretch: { justifyItems: "stretch", alignItems: "stretch" },
           center: { justifyItems: "center", alignItems: "center" },
-        },
+        } as const,
         (styleMap) => [
           {
             display: "grid",
