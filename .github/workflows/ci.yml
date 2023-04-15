@@ -21,5 +21,11 @@ jobs:
         run: npm ci
       - name: Lint codes
         run: npm run lint
-      - name: Build to check
+      - name: Reinstall packages in production mode
+        run: npm ci
+        env:
+          NODE_ENV: production
+      - name: Build in production mode to check
         run: npm run build
+        env:
+          NODE_ENV: production
