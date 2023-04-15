@@ -1,7 +1,10 @@
 import { PerspectiveCamera, Scene, WebGLRenderer } from "three";
 import { ShallowRef, shallowRef, watchEffect } from "vue";
 
-import { useAnimationLoop } from "../animation-loop/useAnimationLoop";
+import {
+  AnimationLoopCallbackProps,
+  useAnimationLoop,
+} from "../animation-loop/useAnimationLoop";
 
 interface CanvasSize {
   readonly width: number;
@@ -21,7 +24,22 @@ interface ThreeAnimation {
   readonly refContainer: ShallowRef<HTMLElement | undefined>;
 }
 
-export function useThreeAnimation(): ThreeAnimation {
+export type ThreeAnimationSetup = (props: { graphics: Graphics }) => void;
+
+export type ThreeAnimationLoop = (props: {
+  graphics: Graphics;
+  animation: AnimationLoopCallbackProps;
+}) => void;
+
+export interface ThreeAnimationProps {
+  setup?: ThreeAnimationSetup;
+  loop: ThreeAnimationLoop;
+}
+
+export function useThreeAnimation({
+  setup,
+  loop,
+}: ThreeAnimationProps): ThreeAnimation {
   const refContainer = shallowRef<HTMLElement>();
   const refContainerSize = shallowRef<CanvasSize>();
   const refGraphics = shallowRef<Graphics>();
@@ -59,15 +77,20 @@ export function useThreeAnimation(): ThreeAnimation {
 
     renderer.setPixelRatio(window.devicePixelRatio);
 
-    refGraphics.value = {
+    const graphics: Graphics = {
       scene,
       renderer,
       camera,
     };
 
-    animationLoop.set(() => {
+    setup?.({ graphics });
+
+    animationLoop.set((animation) => {
+      loop({ graphics, animation });
       renderer.render(scene, camera);
     });
+
+    refGraphics.value = graphics;
 
     onCleanup(() => {
       animationLoop.unset();

@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { recipes } from "../../../themes/recipes.css";
+import { recipes } from "../../../../themes/recipes.css";
 
 export const button = style([
   recipes({

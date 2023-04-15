@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import PlanetMenu from "./@components/PlanetMenu.vue";
-import PlanetMenuItemMercury from "./@components/PlanetMenuItemMercury.vue";
+import PlanetMenuItemMercuryPresentation from "./planet-menu-item-mercury/PlanetMenuItemMercuryPresentation.vue";
 </script>
 
 <template>
   <PlanetMenu>
     <template #item-mercury>
-      <PlanetMenuItemMercury />
+      <PlanetMenuItemMercuryPresentation />
     </template>
-    <template #item-venus>Venus</template>
   </PlanetMenu>
 </template>
