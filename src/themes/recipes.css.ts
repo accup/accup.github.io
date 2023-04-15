@@ -64,12 +64,6 @@ export const recipes = recipe({
       } as const,
       (properties) => [colorSprinkles(properties)]
     ),
-    flow: {
-      root: {
-        display: "flow-root",
-        isolation: "isolate",
-      },
-    },
     flex: {
       // no recipes
     },
@@ -90,5 +84,9 @@ export const recipes = recipe({
         ]
       ),
     },
+    place: styleVariants({
+      stretch: { justifySelf: "stretch", alignSelf: "stretch" },
+      center: { justifySelf: "center", alignSelf: "center" },
+    }),
   },
 });

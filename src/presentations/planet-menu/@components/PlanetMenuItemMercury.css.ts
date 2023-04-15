@@ -7,6 +7,7 @@ export const button = style([
     grid: "center",
   }),
   {
+    isolation: "isolate",
     margin: 0,
     padding: 0,
     border: "none",
@@ -21,15 +22,20 @@ export const text = style([
     text: "text-04",
   }),
   {
+    gridRow: 1,
+    gridColumn: 1,
     fontSize: 50,
   },
 ]);
 
-export const canvas = style([
+export const container = style([
+  recipes({
+    place: "stretch",
+  }),
   {
-    display: "block",
-    position: "absolute",
-    margin: 0,
-    inset: -64,
+    display: "flow-root",
+    gridRow: 1,
+    gridColumn: 1,
+    margin: -32,
   },
 ]);

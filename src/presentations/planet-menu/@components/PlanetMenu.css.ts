@@ -3,10 +3,8 @@ import { style, styleVariants } from "@vanilla-extract/css";
 import { recipes } from "../../../themes/recipes.css";
 
 export const nav = style([
-  recipes({
-    flow: "root",
-  }),
   {
+    display: "flow-root",
     position: "fixed",
     inset: 0,
     overflow: "clip",
