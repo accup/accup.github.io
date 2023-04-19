@@ -8,10 +8,13 @@ const vec4 DZ = vec4(0., 0., 1., 0.);
 const vec4 DW = vec4(0., 0., 0., 1.);
 
 uint hash(uint x) {
-  x ^= (x << 7) ^ (x >> 7);
-  x ^= (x << 9) ^ (x >> 9);
-  x ^= (x << 11) ^ (x >> 11);
-  return x;
+  uint h = x;
+  h += (h << 10u);
+  h ^= (h >> 6u);
+  h += (h << 3u);
+  h ^= (h >> 11u);
+  h += (h << 15u);
+  return h;
 }
 uvec2 hash2(uvec2 x) {
   uvec2 h = x;
@@ -154,7 +157,7 @@ void main() {
   const float highlight = 5.0;
 
   vec3 eye = normalize(-v_coord);
-  vec3 normal = normalize(v_normal * mix(vec3(1.0), fbm3(vec4(0.2 * normalize(v_normal), 1e-4 * u_time), 0.5) - 1.0, 0.9));
+  vec3 normal = normalize(normalize(v_normal) + 0.2 * fbm3(vec4(1.0 * v_position, 1e-4 * u_time), 0.5));
   vec3 lightRef = normalize(reflect(-lightDir, normal));
 
   float diffuse = max(0.0, dot(lightDir, normal));
