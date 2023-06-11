@@ -1,0 +1,12 @@
+{
+  "parser": {
+    "\\.vue$": "@markuplint/vue-parser",
+    "\\.astro$": "@markuplint/astro-parser"
+  },
+  "specs": {
+    "\\.vue$": "@markuplint/vue-spec"
+  },
+  "extends": [
+    "markuplint:recommended"
+  ]
+}

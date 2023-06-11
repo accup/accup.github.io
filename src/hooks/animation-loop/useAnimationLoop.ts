@@ -17,11 +17,6 @@ export interface AnimationLoopCallbackProps {
 
 export type AnimationLoopCallback = (props: AnimationLoopCallbackProps) => void;
 
-interface AnimationLoopOperator {
-  start: () => void;
-  stop: () => void;
-}
-
 export interface AnimationLoop {
   /**
    * 使用するコールバックを変更してアニメーションを開始する

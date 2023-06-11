@@ -9,6 +9,7 @@
     "plugin:import/recommended",
     "plugin:import/typescript",
     "plugin:@typescript-eslint/recommended",
+    "plugin:astro/recommended",
     "plugin:vue/vue3-recommended",
     "prettier"
   ],
@@ -26,5 +27,15 @@
     "import/resolver": {
       "typescript": true
     }
-  }
+  },
+  "overrides": [
+    {
+      "files": ["*.astro"],
+      "parser": "astro-eslint-parser",
+      "parserOptions": {
+        "parser": "@typescript-eslint/parser",
+        "extraFileExtensions": [".astro"]
+      }
+    }
+  ]
 }
