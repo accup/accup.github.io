@@ -1,15 +1,10 @@
 ---
 import Html from "../components/foundations/Html.astro";
+import { root } from "./DefaultLayout.astro.css";
 ---
 
-<script>
-  import { root } from "./DefaultLayout.css";
-
-  document.getElementById("app")?.classList?.add(...root.split(/\s+/));
-</script>
-
 <Html>
-  <div id="app">
+  <div class={root}>
     <slot />
   </div>
 </Html>

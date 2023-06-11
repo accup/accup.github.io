@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { recipes } from "../themes/recipes.css";
+import { recipes } from "../themes-astro/recipes.astro.css";
 
 export const root = style([
   recipes({
