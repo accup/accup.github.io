@@ -6,7 +6,6 @@ import {
   SphereGeometry,
   Vector3,
 } from "three";
-import { degToRad } from "three/src/math/MathUtils";
 import { watchEffect } from "vue";
 
 import { useThreeAnimation } from "../../../../../hooks/three/useThreeAnimation";
@@ -32,6 +31,10 @@ const uniforms: Uniforms = {
 };
 const geometry = new SphereGeometry(1, 64, 64);
 const mesh = new Mesh(geometry, undefined);
+
+function degToRad(degree: number): number {
+  return (Math.PI * degree) / 180;
+}
 
 watchEffect(() => {
   const versionLessVertexShader = vertexShader.replace(
