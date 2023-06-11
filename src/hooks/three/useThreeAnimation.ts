@@ -54,6 +54,7 @@ export function useThreeAnimation({
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const [contentBoxSize] = entry.contentBoxSize;
+        if (contentBoxSize == null) continue;
 
         refContainerSize.value = {
           width: contentBoxSize.inlineSize,

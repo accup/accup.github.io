@@ -9,10 +9,12 @@ import {
 import { degToRad } from "three/src/math/MathUtils";
 import { watchEffect } from "vue";
 
-import { useThreeAnimation } from "../../../../hooks/three/useThreeAnimation";
+import { useThreeAnimation } from "../../../../../hooks/three/useThreeAnimation";
 import vertexShader from "../@shaders/PlanetMenuItem.vert?raw";
 
 import * as styles from "./PlanetMenuItem.css";
+
+const RE_VERSION_DIRECTIVE = /^#version\s+(?<version>.*)\n/;
 
 const props = defineProps<{
   orbitalInclinationDegree: number;
@@ -30,12 +32,28 @@ const uniforms: Uniforms = {
 };
 const geometry = new SphereGeometry(1, 64, 64);
 const mesh = new Mesh(geometry, undefined);
+
 watchEffect(() => {
+  const versionLessVertexShader = vertexShader.replace(
+    RE_VERSION_DIRECTIVE,
+    ""
+  );
+  const versionLessFragmentShader = props.fragmentShader.replace(
+    RE_VERSION_DIRECTIVE,
+    ""
+  );
+  const glslVersion = RE_VERSION_DIRECTIVE.exec(props.fragmentShader)?.groups
+    ?.version;
+
   mesh.material = new RawShaderMaterial({
     uniforms,
-    vertexShader,
-    fragmentShader: props.fragmentShader,
+    vertexShader: versionLessVertexShader,
+    fragmentShader: versionLessFragmentShader,
     transparent: true,
+    glslVersion:
+      glslVersion === "100" || glslVersion === "300 es"
+        ? glslVersion
+        : undefined,
   });
 });
 
@@ -60,7 +78,7 @@ const { refContainer } = useThreeAnimation({
 
 <template>
   <button type="button" :class="styles.button">
-    <div ref="refContainer" :class="styles.container" />
+    <span ref="refContainer" :class="styles.container" />
     <span :class="styles.text">
       <slot />
     </span>
