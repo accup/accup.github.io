@@ -1,5 +1,6 @@
 ---
 import { googleFont } from "./Html";
+import "./Html.astro.css";
 ---
 
 <html lang="ja">
@@ -10,9 +11,6 @@ import { googleFont } from "./Html";
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href={googleFont} rel="stylesheet" />
-    <script>
-      import "./Html.css";
-    </script>
   </head>
   <body>
     <slot />

@@ -21,7 +21,22 @@
   "plugins": ["vue", "@typescript-eslint", "unused-imports"],
   "rules": {
     "@typescript-eslint/no-unused-vars": "off",
-    "unused-imports/no-unused-imports": "warn"
+    "unused-imports/no-unused-imports": "warn",
+    "import/no-restricted-paths": [
+      "error",
+      {
+        "zones": [
+          {
+            "target": "./src/**/*.@(astro|astro.css|astro.css.ts)",
+            "from": "./src/**/!(*.astro).@(css|css.ts)"
+          },
+          {
+            "target": "./src/**/!(*.astro|*.astro.css|*.astro.css.ts)",
+            "from": "./src/**/*.astro.@(css|css.ts)"
+          }
+        ]
+      }
+    ]
   },
   "settings": {
     "import/resolver": {
