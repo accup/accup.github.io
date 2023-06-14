@@ -15,33 +15,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  build:
+    env:
+      # Fallback value of Node.js version
+      node_version: 16
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your repository using git
+        uses: actions/checkout@v3
+      - name: Extract Node version
+        run: echo "node_version=`cat .node-version | sed -r '/^\s*$/d;s/^\s*|\s*$//g'`" >> "$GITHUB_ENV"
+      - name: Install, build, and upload your site
+        uses: withastro/action@v0
+        with:
+          node-version: ${{ env.node_version }}
+
   deploy:
+    needs: build
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    env:
-      NODE_ENV: production
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Extract Node version
-        run: |
-          echo "node_version=`cat .node-version | sed -r '/^\s*$/d;s/^\s*|\s*$//g'`" >> $GITHUB_ENV
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.node_version }}
-      - name: Install packages
-        run: npm ci
-      - name: Build files
-        run: npm run build
-      - name: Setup Pages
-        uses: actions/configure-pages@v2
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: "./dist"
       - name: Deploy to Pages
         id: deployment
         uses: actions/deploy-pages@v1
