@@ -80,10 +80,10 @@ const { refContainer } = useThreeAnimation({
 </script>
 
 <template>
-  <button type="button" :class="styles.button">
+  <div :class="styles.button">
     <span ref="refContainer" :class="styles.container" />
     <span :class="styles.text">
       <slot />
     </span>
-  </button>
+  </div>
 </template>
