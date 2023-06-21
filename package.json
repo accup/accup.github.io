@@ -24,6 +24,7 @@
     "@vanilla-extract/sprinkles": "^1.6.0",
     "@vanilla-extract/vite-plugin": "^3.8.0",
     "astro": "^2.6.3",
+    "imask": "^7.0.0",
     "three": "^0.153.0",
     "typescript": "^5.0.4",
     "vue": "^3.2.45",
