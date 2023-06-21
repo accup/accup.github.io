@@ -6,9 +6,10 @@ import PlanetMenuItem from "../@components/PlanetMenuItem.vue";
 
 import fragmentShader from "./@shaders/PlanetMenuItemVenus.frag?raw";
 
-import { input, label } from "./PlanetMenuItemVenusPresentation.css";
+import { input, label, value } from "./PlanetMenuItemVenusPresentation.css";
 
-const refInput = ref<HTMLElement>();
+const refInput = ref<HTMLInputElement>();
+const refValue = ref<string>("3141592");
 
 watchEffect((cleanUp) => {
   const input = refInput.value;
@@ -20,10 +21,14 @@ watchEffect((cleanUp) => {
     radix: ".",
     thousandsSeparator: ",",
     normalizeZeros: true,
-    min: -9_999_999,
-    max: 9_999_999,
+    min: -999_999_999_999_999,
+    max: 999_999_999_999_999,
   });
-  mask.updateControl();
+  mask.on("complete", () => {
+    refValue.value = mask.value;
+  });
+
+  refValue.value = mask.value;
 
   cleanUp(() => {
     mask.destroy();
@@ -42,11 +47,12 @@ watchEffect((cleanUp) => {
       <span>金星</span>
       <input
         ref="refInput"
+        :value="refValue"
         :class="input"
-        value="100000"
         type="text"
         pattern="[\d,]+"
       />
+      <span :class="value">{{ refValue }}</span>
     </label>
   </PlanetMenuItem>
 </template>

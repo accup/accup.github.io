@@ -7,8 +7,26 @@ export const label = style([
     flex: "column",
   }),
   {
-    gap: 30,
+    gap: 20,
     alignItems: "center",
+  },
+]);
+
+export const value = style([
+  recipes({
+    font: "sans-04",
+  }),
+  {
+    display: "block",
+    maxWidth: 150,
+    wordBreak: "break-all",
+    textAlign: "center",
+    maxHeight: 80,
+    overflowY: "auto",
+    scrollbarWidth: "none",
+    "::-webkit-scrollbar": {
+      display: "none",
+    },
   },
 ]);
 
