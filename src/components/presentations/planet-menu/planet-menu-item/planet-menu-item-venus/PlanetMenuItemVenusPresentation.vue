@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import IMask from "imask";
+import { FactoryArg, InputMask } from "imask";
 import { ref, watchEffect } from "vue";
 
 import PlanetMenuItem from "../@components/PlanetMenuItem.vue";
@@ -15,7 +15,34 @@ watchEffect((cleanUp) => {
   const input = refInput.value;
   if (input == null) return;
 
-  const mask = IMask(input, {
+  class InputMask2<Opts extends FactoryArg> extends InputMask<Opts> {
+    #composing = false;
+
+    constructor(el: HTMLInputElement, opts: Opts) {
+      el.addEventListener("compositionstart", () => {
+        this.#composing = true;
+      });
+      el.addEventListener("compositionend", () => {
+        this.#composing = false;
+        this.updateValue();
+        this.updateControl();
+      });
+
+      super(el, opts);
+    }
+
+    override destroy(): void {
+      super.destroy();
+    }
+
+    override _onInput(e: InputEvent): void {
+      if (this.#composing) return;
+
+      super._onInput(e);
+    }
+  }
+
+  const mask = new InputMask2(input, {
     mask: Number,
     scale: 0,
     radix: ".",
@@ -50,7 +77,7 @@ watchEffect((cleanUp) => {
         :value="refValue"
         :class="input"
         type="text"
-        pattern="[\d,]+"
+        pattern="^[\d,]+$"
       />
       <span :class="value">{{ refValue }}</span>
     </label>
