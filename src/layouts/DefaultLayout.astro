@@ -1,10 +1,14 @@
 ---
 import Html from "../components/foundations/Html.astro";
-import { root } from "./DefaultLayout.astro.css";
+import { body } from "./DefaultLayout.astro.css";
+
+export type Props = {
+  title: string;
+};
+
+const { title } = Astro.props;
 ---
 
-<Html>
-  <div class={root}>
-    <slot />
-  </div>
+<Html title={title} body.class:list={body}>
+  <slot />
 </Html>

@@ -1,18 +1,26 @@
 ---
+import type { HTMLAttributes } from "astro/types";
 import { googleFont } from "./Html";
 import "./Html.astro.css";
+
+export type Props = {
+  title: string;
+  "body.class:list"?: HTMLAttributes<"body">["class:list"];
+};
+
+const { title, "body.class:list": bodyClassList = [] } = Astro.props;
 ---
 
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Under Construction</title>
+    <title>{title}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href={googleFont} rel="stylesheet" />
   </head>
-  <body>
+  <body class:list={bodyClassList}>
     <slot />
   </body>
 </html>
