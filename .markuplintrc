@@ -1,9 +1,11 @@
 {
   "parser": {
+    "\\.tsx": "@markuplint/jsx-parser",
     "\\.vue$": "@markuplint/vue-parser",
     "\\.astro$": "@markuplint/astro-parser"
   },
   "specs": {
+    "\\.tsx": "@markuplint/react-parser",
     "\\.vue$": "@markuplint/vue-spec"
   },
   "extends": [
