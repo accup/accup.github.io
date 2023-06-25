@@ -38,7 +38,8 @@ export const ResizableStack = ({
   direction: ResizableStackDirection;
   children: readonly ResizableStackItem[];
 }) => {
-  const [refRoot, writingModes] = useWritingModes();
+  const rootRef = useRef<HTMLDivElement>(null);
+  const writingModes = useWritingModes(rootRef);
 
   const initialStateMap = useMemo(() => new Map(), []);
   const stateMapRef = useRef<Map<string, ChildState>>(initialStateMap);
@@ -150,7 +151,7 @@ export const ResizableStack = ({
 
   return (
     <div
-      ref={refRoot}
+      ref={rootRef}
       className={classNames(classes.root, {
         [classes.rootIs.row]: direction === "row",
         [classes.rootIs.column]: direction === "column",

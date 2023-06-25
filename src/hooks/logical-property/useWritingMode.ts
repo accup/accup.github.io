@@ -1,4 +1,4 @@
-import { RefCallback, useCallback, useMemo, useState } from "react";
+import { RefObject, useCallback, useRef, useState } from "react";
 
 import {
   AnimationLoopCallback,
@@ -10,31 +10,33 @@ export type WritingModes = {
   direction: string;
 };
 
-export function useWritingModes(): [RefCallback<HTMLElement>, WritingModes] {
-  const [target, setTarget] = useState<HTMLElement | null>(null);
-  const computedStyle = useMemo(
-    () => getComputedStyle(target ?? document.body),
-    [target]
+export function useWritingModes(ref: RefObject<HTMLElement>): WritingModes {
+  const targetRef = useRef(ref.current);
+  const computedStyleRef = useRef(
+    getComputedStyle(ref.current ?? document.body)
   );
 
   const [writingMode, setWritingMode] = useState<string>(
-    computedStyle.writingMode
+    computedStyleRef.current.writingMode
   );
-  const [direction, setDirection] = useState<string>(computedStyle.direction);
+  const [direction, setDirection] = useState<string>(
+    computedStyleRef.current.direction
+  );
 
   const animationLoopCallback = useCallback<AnimationLoopCallback>(() => {
+    if (targetRef.current !== ref.current) {
+      targetRef.current = ref.current;
+      computedStyleRef.current = getComputedStyle(
+        targetRef.current ?? document.body
+      );
+    }
+
+    const computedStyle = computedStyleRef.current;
     setWritingMode(computedStyle.writingMode);
     setDirection(computedStyle.direction);
-  }, [computedStyle, setWritingMode, setDirection]);
+  }, [ref, targetRef, computedStyleRef, setWritingMode, setDirection]);
 
   useAnimationLoop(animationLoopCallback);
 
-  const ref = useCallback(
-    (instance: HTMLElement | null) => {
-      setTarget(instance);
-    },
-    [setTarget]
-  );
-
-  return [ref, { writingMode, direction }];
+  return { writingMode, direction };
 }
