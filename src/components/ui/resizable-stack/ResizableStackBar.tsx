@@ -89,6 +89,8 @@ export const ResizableStackBar = memo(
 
         const { xStart, yStart } = resizeStartStateRef.current;
 
+        e.preventDefault();
+
         onResizing?.(
           getResizeDetails({
             xStart,
@@ -109,6 +111,8 @@ export const ResizableStackBar = memo(
         const { pointerId, xStart, yStart } = resizeStartStateRef.current;
 
         if (e.pointerId !== pointerId) return;
+
+        e.preventDefault();
 
         onResizing?.(
           getResizeDetails({
@@ -133,6 +137,8 @@ export const ResizableStackBar = memo(
         // e.target.releasePointerCapture(pointerId);
 
         resizeStartStateRef.current = undefined;
+
+        e.preventDefault();
 
         onResized?.(
           getResizeDetails({
