@@ -134,8 +134,6 @@ export const ResizableStackBar = memo(
         const { pointerId, xStart, yStart } = resizeStartStateRef.current;
         if (e.pointerId !== pointerId) return;
 
-        // e.target.releasePointerCapture(pointerId);
-
         resizeStartStateRef.current = undefined;
 
         e.preventDefault();
