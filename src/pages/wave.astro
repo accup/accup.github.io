@@ -1,0 +1,8 @@
+---
+import { WavePresentation } from "../components/presentations/wave/WavePresentation";
+import DefaultLayout from "../layouts/DefaultLayout.astro";
+---
+
+<DefaultLayout title="wave">
+  <WavePresentation client:only="react" />
+</DefaultLayout>
