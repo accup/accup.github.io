@@ -19,6 +19,7 @@ export const root = style([
     flex: "none",
     boxSizing: "border-box",
     backgroundColor: theme.color.fgPrimary,
+    touchAction: "none",
   },
 ]);
 export const rootIs = styleVariants({
