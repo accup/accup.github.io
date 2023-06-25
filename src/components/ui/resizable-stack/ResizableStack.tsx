@@ -21,8 +21,13 @@ export type ResizableStackItem = {
 };
 
 type ChildState = ResizableStackItem & {
+  /** determined space */
   size: number;
+  /** free space */
+  extraSize: number;
+  /** undetermined space */
   pendingSize: number;
+  /** resize bar */
   resizeBar?:
     | {
         onResizing: (details: ResizeDetails) => void;
@@ -34,9 +39,11 @@ type ChildState = ResizableStackItem & {
 export const ResizableStack = ({
   direction,
   children,
+  barSize = 6,
 }: {
   direction: ResizableStackDirection;
   children: readonly ResizableStackItem[];
+  barSize?: number;
 }) => {
   const rootRef = useRef<HTMLDivElement>(null);
   const writingModes = useWritingModes(rootRef);
@@ -50,6 +57,7 @@ export const ResizableStack = ({
       return {
         ...child,
         size: child.initialSize,
+        extraSize: 0,
         pendingSize: child.initialSize,
       };
     },
@@ -66,8 +74,20 @@ export const ResizableStack = ({
     );
   }, [children, stateMapRef]);
 
-  const mutatePendingState = useCallback(
+  const mutateStateToDetermineExtraSize = useCallback(() => {
+    const stateMap = stateMapRef.current;
+
+    stateMap.forEach((state) => {
+      state.size = Math.max(0, state.size + state.extraSize);
+      state.pendingSize = state.size;
+      state.extraSize = 0;
+    });
+  }, [stateMapRef]);
+
+  const mutateStateToResizePendingSize = useCallback(
     (details: ResizeDetails, prevKey: string, nextKey: string) => {
+      mutateStateToDetermineExtraSize();
+
       const stateMap = stateMapRef.current;
       const prevState = stateMap.get(prevKey);
       const nextState = stateMap.get(nextKey);
@@ -93,15 +113,15 @@ export const ResizableStack = ({
 
   const handleResizing = useCallback(
     (details: ResizeDetails, prevKey: string, nextKey: string) => {
-      mutatePendingState(details, prevKey, nextKey);
+      mutateStateToResizePendingSize(details, prevKey, nextKey);
       updateStateList();
     },
-    [stateMapRef, updateStateList, mutatePendingState]
+    [stateMapRef, updateStateList, mutateStateToResizePendingSize]
   );
 
   const handleResized = useCallback(
     (details: ResizeDetails, prevKey: string, nextKey: string) => {
-      mutatePendingState(details, prevKey, nextKey);
+      mutateStateToResizePendingSize(details, prevKey, nextKey);
 
       const stateMap = stateMapRef.current;
       const prevState = stateMap.get(prevKey);
@@ -116,7 +136,7 @@ export const ResizableStack = ({
 
       updateStateList();
     },
-    [stateMapRef, updateStateList, mutatePendingState]
+    [stateMapRef, updateStateList, mutateStateToResizePendingSize]
   );
 
   useEffect(() => {
@@ -149,6 +169,57 @@ export const ResizableStack = ({
     updateStateList();
   }, [children, stateMapRef, updateStateList, handleResizing, handleResized]);
 
+  const mutateStateToSpreadExtraSize = useCallback(
+    (fullSize: number) => {
+      const stateMap = stateMapRef.current;
+
+      let totalSize = barSize * Math.max(0, stateMap.size - 1);
+      stateMap.forEach((state) => {
+        totalSize += state.size;
+      });
+
+      const freeSize = fullSize - totalSize;
+
+      let index = 0;
+      for (const state of stateMap.values()) {
+        const lower = Math.floor((freeSize * index) / stateMap.size);
+        const upper = Math.floor((freeSize * (index + 1)) / stateMap.size);
+        state.extraSize = upper - lower;
+
+        ++index;
+      }
+    },
+    [stateMapRef, barSize]
+  );
+
+  useEffect(() => {
+    if (rootRef.current == null) return;
+
+    const observer = new ResizeObserver((entries) => {
+      entries.forEach((entry) => {
+        const [size] = entry.contentBoxSize;
+        if (size == null) return;
+
+        switch (direction) {
+          case "row":
+            mutateStateToSpreadExtraSize(size.inlineSize);
+            break;
+
+          case "column":
+            mutateStateToSpreadExtraSize(size.blockSize);
+            break;
+        }
+      });
+
+      updateStateList();
+    });
+    observer.observe(rootRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [direction, rootRef, updateStateList, mutateStateToSpreadExtraSize]);
+
   return (
     <div
       ref={rootRef}
@@ -163,6 +234,7 @@ export const ResizableStack = ({
             <ResizableStackBar
               direction={direction}
               writingModes={writingModes}
+              size={barSize}
               onResizing={child.resizeBar.onResizing}
               onResized={child.resizeBar.onResized}
             />
@@ -170,8 +242,14 @@ export const ResizableStack = ({
           <div
             className={classes.child}
             style={{
-              blockSize: direction === "column" ? child.pendingSize : undefined,
-              inlineSize: direction === "row" ? child.pendingSize : undefined,
+              blockSize:
+                direction === "column"
+                  ? child.pendingSize + child.extraSize
+                  : undefined,
+              inlineSize:
+                direction === "row"
+                  ? child.pendingSize + child.extraSize
+                  : undefined,
             }}
           >
             {child.children}

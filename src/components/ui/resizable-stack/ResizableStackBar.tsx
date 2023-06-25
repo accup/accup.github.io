@@ -2,7 +2,7 @@ import { useLogicalConverter } from "../../../hooks/logical-property/useLogicalC
 import type { WritingModes } from "../../../hooks/logical-property/useWritingMode";
 import * as classes from "../resizable-stack/ResizableStackBar.css";
 import classNames from "classnames";
-import { PointerEvent, memo, useCallback, useRef } from "react";
+import { PointerEvent, memo, useCallback, useMemo, useRef } from "react";
 
 export type ResizableStackBarDirection = "row" | "column";
 
@@ -17,11 +17,13 @@ export const ResizableStackBar = memo(
   ({
     direction,
     writingModes,
+    size,
     onResizing,
     onResized,
   }: {
     direction: ResizableStackBarDirection;
     writingModes: WritingModes;
+    size: number;
     onResizing?: ResizingCallback;
     onResized?: ResizedCallback;
   }) => {
@@ -128,7 +130,7 @@ export const ResizableStackBar = memo(
         const { pointerId, xStart, yStart } = resizeStartStateRef.current;
         if (e.pointerId !== pointerId) return;
 
-        e.target.releasePointerCapture(pointerId);
+        // e.target.releasePointerCapture(pointerId);
 
         resizeStartStateRef.current = undefined;
 
@@ -144,12 +146,26 @@ export const ResizableStackBar = memo(
       [resizeStartStateRef, onResizing, getResizeDetails]
     );
 
+    const style = useMemo(() => {
+      switch (direction) {
+        case "row":
+          return {
+            inlineSize: size,
+          };
+        case "column":
+          return {
+            blockSize: size,
+          };
+      }
+    }, [size, direction]);
+
     return (
       <div
         className={classNames(classes.root, {
           [classes.rootIs.row]: direction === "row",
           [classes.rootIs.column]: direction === "column",
         })}
+        style={style}
         onPointerDown={handleResizeStart}
         onPointerMove={handleResize}
         onPointerCancel={handleResizeEnd}
