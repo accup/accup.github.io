@@ -71,7 +71,6 @@ watchEffect((cleanUp) => {
     :fragment-shader="fragmentShader"
   >
     <label :class="label">
-      <span>金星</span>
       <input
         ref="refInput"
         :value="refValue"
