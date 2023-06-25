@@ -173,21 +173,27 @@ export const ResizableStack = ({
     (fullSize: number) => {
       const stateMap = stateMapRef.current;
 
-      let totalSize = barSize * Math.max(0, stateMap.size - 1);
-      stateMap.forEach((state) => {
-        totalSize += state.size;
-      });
+      const states = [...stateMap.values()];
+
+      const totalItemSize = states.reduce((sub, state) => sub + state.size, 0);
+      const totalBarSize = barSize * Math.max(0, stateMap.size - 1);
+      const totalSize = totalItemSize + totalBarSize;
 
       const freeSize = fullSize - totalSize;
 
-      let index = 0;
-      for (const state of stateMap.values()) {
-        const lower = Math.floor((freeSize * index) / stateMap.size);
-        const upper = Math.floor((freeSize * (index + 1)) / stateMap.size);
-        state.extraSize = upper - lower;
+      let subtotalItemSize = 0;
+      states.forEach((state) => {
+        const nextSubtotalItemSize = subtotalItemSize + state.size;
 
-        ++index;
-      }
+        const lower = Math.floor((freeSize * subtotalItemSize) / totalItemSize);
+        const upper = Math.floor(
+          (freeSize * nextSubtotalItemSize) / totalItemSize
+        );
+
+        subtotalItemSize = nextSubtotalItemSize;
+
+        state.extraSize = upper - lower;
+      });
     },
     [stateMapRef, barSize]
   );
