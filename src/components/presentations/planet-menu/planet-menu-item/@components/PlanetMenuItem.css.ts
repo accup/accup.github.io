@@ -13,6 +13,7 @@ export const button = style([
     border: "none",
     background: "none",
     cursor: "pointer",
+    textDecoration: "none",
   },
   {
     ":focus-within": {

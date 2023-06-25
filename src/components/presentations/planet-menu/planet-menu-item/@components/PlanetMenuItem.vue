@@ -6,7 +6,7 @@ import {
   SphereGeometry,
   Vector3,
 } from "three";
-import { watchEffect } from "vue";
+import { computed, watchEffect } from "vue";
 
 import { useThreeAnimation } from "../../../../../hooks/three/useThreeAnimation";
 import vertexShader from "../@shaders/PlanetMenuItem.vert?raw";
@@ -16,6 +16,7 @@ import * as styles from "./PlanetMenuItem.css";
 const RE_VERSION_DIRECTIVE = /^#version\s+(?<version>.*)\n/;
 
 const props = defineProps<{
+  href?: string;
   orbitalInclinationDegree: number;
   axialTiltDegree: number;
   rotationPeriodDays: number;
@@ -77,13 +78,15 @@ const { refContainer } = useThreeAnimation({
     uniforms.u_time.value = animationTimeMs;
   },
 });
+
+const ButtonTag = computed(() => (props.href != null ? "a" : "div"));
 </script>
 
 <template>
-  <div :class="styles.button">
+  <ButtonTag :class="styles.button" v-bind="{ href: props.href }">
     <span ref="refContainer" :class="styles.container" />
     <span :class="styles.text">
       <slot />
     </span>
-  </div>
+  </ButtonTag>
 </template>
