@@ -5,10 +5,10 @@ import { theme } from "../../../themes/theme.css";
 export const defaultTheme = createTheme(theme, {
   color: {
     fg: "#fafafa",
-    fgPrimary: "#aedbff",
+    fgPrimary: "#e4f3ff",
     fgSecondary: "#efb9ff",
-    bg: "#3c323f",
-    bgPrimary: "#2a6697",
+    bg: "#292b2c",
+    bgPrimary: "#678297",
     bgSecondary: "#744283",
   },
 });

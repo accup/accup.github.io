@@ -5,6 +5,11 @@ import classNames from "classnames";
 import { PointerEvent, memo, useCallback, useMemo, useRef } from "react";
 
 export type ResizableStackBarDirection = "row" | "column";
+export type ResizableStackBarPosition =
+  | "start"
+  | "intermediate"
+  | "end"
+  | "both";
 
 export type ResizeDetails = {
   lengthwiseShift: number;
@@ -18,10 +23,12 @@ export const ResizableStackBar = memo(
     direction,
     writingModes,
     size,
+    position,
     onResizing,
     onResized,
   }: {
     direction: ResizableStackBarDirection;
+    position: ResizableStackBarPosition;
     writingModes: WritingModes;
     size: number;
     onResizing?: ResizingCallback;
@@ -147,7 +154,7 @@ export const ResizableStackBar = memo(
           })
         );
       },
-      [resizeStartStateRef, onResizing, getResizeDetails]
+      [resizeStartStateRef, onResized, getResizeDetails]
     );
 
     const style = useMemo(() => {
@@ -163,12 +170,41 @@ export const ResizableStackBar = memo(
       }
     }, [size, direction]);
 
+    const classRootIs = useMemo(() => {
+      const classRootIsDirection = logicalConvert({
+        x: classes.rootIs.horizontal,
+        y: classes.rootIs.vertical,
+      });
+      const classRootIsUniqueEnd = logicalConvert({
+        top: classes.rootIs.verticalTopEnd,
+        right: classes.rootIs.horizontalRightEnd,
+        bottom: classes.rootIs.verticalBottomEnd,
+        left: classes.rootIs.horizontalLeftEnd,
+      });
+      const classRootIsBothEnd = logicalConvert({
+        x: classes.rootIs.horizontalBothEnd,
+        y: classes.rootIs.verticalBothEnd,
+      });
+
+      switch (direction) {
+        case "row":
+          return classNames(classes.rootIs.row, classRootIsDirection.inline, {
+            [classRootIsUniqueEnd.inlineStart]: position === "start",
+            [classRootIsUniqueEnd.inlineEnd]: position === "end",
+            [classRootIsBothEnd.inline]: position === "both",
+          });
+        case "column":
+          return classNames(classes.rootIs.column, classRootIsDirection.block, {
+            [classRootIsUniqueEnd.blockStart]: position === "start",
+            [classRootIsUniqueEnd.blockEnd]: position === "end",
+            [classRootIsBothEnd.block]: position === "both",
+          });
+      }
+    }, [direction, position, logicalConvert]);
+
     return (
       <div
-        className={classNames(classes.root, {
-          [classes.rootIs.row]: direction === "row",
-          [classes.rootIs.column]: direction === "column",
-        })}
+        className={classNames(classes.root, classRootIs)}
         style={style}
         onPointerDown={handleResizeStart}
         onPointerMove={handleResize}
