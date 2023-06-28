@@ -1,6 +1,10 @@
 import { useWritingModes } from "../../../hooks/logical-property/useWritingMode";
 import * as classes from "../resizable-stack/ResizableStack.css";
-import { ResizableStackBar, ResizeDetails } from "./ResizableStackBar";
+import {
+  ResizableStackBar,
+  ResizableStackBarPosition,
+  ResizeDetails,
+} from "./ResizableStackBar";
 import classNames from "classnames";
 import {
   type ReactNode,
@@ -15,14 +19,23 @@ import {
 type ResizableStackDirection = "row" | "column";
 
 export type ResizableStackItem = {
+  /** identity */
   key: string;
-  initialSize: number;
+  /** frame contents */
   children: ReactNode;
+  /** initial determined space */
+  initialSize: number;
+  /** lower space constraint */
+  minSize?: number;
+  /** lower space constraint */
+  maxSize?: number;
 };
 
-type ChildState = ResizableStackItem & {
+type ChildState = Omit<ResizableStackItem, "minSize"> & {
   /** determined space */
   size: number;
+  /** lower space constraint */
+  minSize: number;
   /** free space */
   extraSize: number;
   /** undetermined space */
@@ -30,6 +43,8 @@ type ChildState = ResizableStackItem & {
   /** resize bar */
   resizeBar?:
     | {
+        formerKey: string;
+        position: ResizableStackBarPosition;
         onResizing: (details: ResizeDetails) => void;
         onResized: (details: ResizeDetails) => void;
       }
@@ -54,12 +69,57 @@ export const ResizableStack = ({
 
   const createInitialState = useCallback(
     (child: ResizableStackItem): ChildState => {
+      const minSize = child.minSize ?? 0;
+      const initialSize = Math.max(child.initialSize, minSize);
+
       return {
         ...child,
-        size: child.initialSize,
+        size: initialSize,
+        minSize,
         extraSize: 0,
-        pendingSize: child.initialSize,
+        pendingSize: initialSize,
       };
+    },
+    []
+  );
+
+  const getBarPosition = useCallback(
+    (
+      formerState: ChildState,
+      latterState: ChildState
+    ): ResizableStackBarPosition => {
+      const formerMinSize = formerState.minSize;
+      const formerMaxSize = formerState.maxSize;
+      const latterMinSize = latterState.minSize;
+      const latterMaxSize = latterState.maxSize;
+
+      const isFormerSmallest =
+        formerState.pendingSize + formerState.extraSize <= formerMinSize;
+      const isFormerLargest =
+        formerMaxSize != null &&
+        formerState.pendingSize + formerState.extraSize >= formerMaxSize;
+      const isLatterSmallest =
+        latterState.pendingSize + latterState.extraSize <= latterMinSize;
+      const isLatterLargest =
+        latterMaxSize != null &&
+        latterState.pendingSize + latterState.extraSize >= latterMaxSize;
+
+      const isStart = isFormerSmallest || isLatterLargest;
+      const isEnd = isFormerLargest || isLatterSmallest;
+
+      if (isStart) {
+        if (isEnd) {
+          return "both";
+        } else {
+          return "start";
+        }
+      } else {
+        if (isEnd) {
+          return "end";
+        } else {
+          return "intermediate";
+        }
+      }
     },
     []
   );
@@ -84,48 +144,57 @@ export const ResizableStack = ({
     });
   }, [stateMapRef]);
 
-  const mutateStateToResizePendingSize = useCallback(
-    (details: ResizeDetails, prevKey: string, nextKey: string) => {
-      mutateStateToDetermineExtraSize();
+  const mutateStateToUpdateBarPosition = useCallback(() => {
+    const stateMap = stateMapRef.current;
 
+    stateMap.forEach((state) => {
+      if (state.resizeBar == null) return;
+
+      const formerState = stateMap.get(state.resizeBar.formerKey);
+      if (formerState == null) return;
+
+      state.resizeBar.position = getBarPosition(formerState, state);
+    });
+  }, [stateMapRef, getBarPosition]);
+
+  const mutateStateToResizePendingSize = useCallback(
+    (details: ResizeDetails, formerKey: string, latterKey: string) => {
       const stateMap = stateMapRef.current;
-      const prevState = stateMap.get(prevKey);
-      const nextState = stateMap.get(nextKey);
+      const formerState = stateMap.get(formerKey);
+      const latterState = stateMap.get(latterKey);
 
       let { lengthwiseShift } = details;
 
-      if (prevState != null) {
-        lengthwiseShift = Math.max(lengthwiseShift, -prevState.size);
+      if (formerState != null) {
+        lengthwiseShift = Math.max(
+          lengthwiseShift,
+          -formerState.size,
+          -(formerState.size - formerState.minSize)
+        );
       }
-      if (nextState != null) {
-        lengthwiseShift = Math.min(lengthwiseShift, nextState.size);
+      if (latterState != null) {
+        lengthwiseShift = Math.min(
+          lengthwiseShift,
+          latterState.size,
+          latterState.size - latterState.minSize
+        );
       }
 
-      if (prevState != null) {
-        prevState.pendingSize = prevState.size + lengthwiseShift;
+      if (formerState != null) {
+        formerState.pendingSize = formerState.size + lengthwiseShift;
       }
-      if (nextState != null) {
-        nextState.pendingSize = nextState.size - lengthwiseShift;
+      if (latterState != null) {
+        latterState.pendingSize = latterState.size - lengthwiseShift;
       }
     },
     [stateMapRef]
   );
 
-  const handleResizing = useCallback(
-    (details: ResizeDetails, prevKey: string, nextKey: string) => {
-      mutateStateToResizePendingSize(details, prevKey, nextKey);
-      updateStateList();
-    },
-    [stateMapRef, updateStateList, mutateStateToResizePendingSize]
-  );
-
-  const handleResized = useCallback(
-    (details: ResizeDetails, prevKey: string, nextKey: string) => {
-      mutateStateToResizePendingSize(details, prevKey, nextKey);
-
+  const mutateStateToFixSize = useCallback(
+    (formerKey: string, latterKey: string) => {
       const stateMap = stateMapRef.current;
-      const prevState = stateMap.get(prevKey);
-      const nextState = stateMap.get(nextKey);
+      const prevState = stateMap.get(formerKey);
+      const nextState = stateMap.get(latterKey);
 
       if (prevState != null) {
         prevState.size = prevState.pendingSize;
@@ -133,50 +202,29 @@ export const ResizableStack = ({
       if (nextState != null) {
         nextState.size = nextState.pendingSize;
       }
-
-      updateStateList();
     },
-    [stateMapRef, updateStateList, mutateStateToResizePendingSize]
+    [stateMapRef]
   );
-
-  useEffect(() => {
-    const prevStateMap = stateMapRef.current;
-
-    stateMapRef.current = new Map(
-      children.map<[string, ChildState]>((child, index, self) => {
-        const prevChild = self[index - 1];
-
-        return [
-          child.key,
-          {
-            ...(prevStateMap.get(child.key) ?? createInitialState(child)),
-            resizeBar:
-              prevChild == null
-                ? undefined
-                : {
-                    onResizing: (details) => {
-                      handleResizing(details, prevChild.key, child.key);
-                    },
-                    onResized: (details) => {
-                      handleResized(details, prevChild.key, child.key);
-                    },
-                  },
-          },
-        ];
-      })
-    );
-
-    updateStateList();
-  }, [children, stateMapRef, updateStateList, handleResizing, handleResized]);
 
   const mutateStateToSpreadExtraSize = useCallback(
     (fullSize: number) => {
       const stateMap = stateMapRef.current;
 
-      const states = [...stateMap.values()];
+      const states = Array.from(stateMap.values());
 
-      const totalItemSize = states.reduce((sub, state) => sub + state.size, 0);
-      const totalBarSize = barSize * Math.max(0, stateMap.size - 1);
+      const totalItemBasis = states.reduce(
+        (sub, state) => sub + state.minSize,
+        0
+      );
+      const totalItemFlex = states.reduce(
+        (sub, state) => sub + state.size - state.minSize,
+        0
+      );
+      const totalItemSize = totalItemBasis + totalItemFlex;
+
+      const totalBarBasis = barSize * Math.max(0, stateMap.size - 1);
+      const totalBarSize = totalBarBasis;
+
       const totalSize = totalItemSize + totalBarSize;
 
       const freeSize = fullSize - totalSize;
@@ -192,11 +240,93 @@ export const ResizableStack = ({
 
         subtotalItemSize = nextSubtotalItemSize;
 
-        state.extraSize = upper - lower;
+        const extraSize = Math.max(upper - lower, state.minSize - state.size);
+        state.extraSize = extraSize;
       });
     },
     [stateMapRef, barSize]
   );
+
+  const handleResizing = useCallback(
+    (details: ResizeDetails, formerKey: string, latterKey: string) => {
+      mutateStateToDetermineExtraSize();
+      mutateStateToResizePendingSize(details, formerKey, latterKey);
+      mutateStateToUpdateBarPosition();
+      updateStateList();
+    },
+    [
+      updateStateList,
+      mutateStateToDetermineExtraSize,
+      mutateStateToResizePendingSize,
+      mutateStateToUpdateBarPosition,
+    ]
+  );
+
+  const handleResized = useCallback(
+    (details: ResizeDetails, formerKey: string, latterKey: string) => {
+      mutateStateToDetermineExtraSize();
+      mutateStateToResizePendingSize(details, formerKey, latterKey);
+      mutateStateToFixSize(formerKey, latterKey);
+      mutateStateToUpdateBarPosition();
+      updateStateList();
+    },
+    [
+      updateStateList,
+      mutateStateToDetermineExtraSize,
+      mutateStateToResizePendingSize,
+      mutateStateToFixSize,
+      mutateStateToUpdateBarPosition,
+    ]
+  );
+
+  const mutateStateToReinitialize = useCallback(
+    (children: readonly ResizableStackItem[]) => {
+      const prevStateMap = stateMapRef.current;
+
+      let formerSiblingState: ChildState | null = null;
+
+      stateMapRef.current = new Map(
+        children.map<[string, ChildState]>((child) => {
+          const prevState =
+            prevStateMap.get(child.key) ?? createInitialState(child);
+
+          const formerState = formerSiblingState;
+          const state: ChildState = {
+            ...prevState,
+            resizeBar:
+              formerState == null
+                ? undefined
+                : {
+                    formerKey: formerState.key,
+                    position: getBarPosition(formerState, prevState),
+                    onResizing: (details) => {
+                      handleResizing(details, formerState.key, child.key);
+                    },
+                    onResized: (details) => {
+                      handleResized(details, formerState.key, child.key);
+                    },
+                  },
+          };
+
+          formerSiblingState = state;
+
+          return [child.key, state];
+        })
+      );
+    },
+    [
+      stateMapRef,
+      getBarPosition,
+      createInitialState,
+      handleResizing,
+      handleResized,
+    ]
+  );
+
+  useEffect(() => {
+    mutateStateToReinitialize(children);
+    updateStateList();
+  }, [children, updateStateList, mutateStateToReinitialize]);
 
   useEffect(() => {
     if (rootRef.current == null) return;
@@ -217,6 +347,7 @@ export const ResizableStack = ({
         }
       });
 
+      mutateStateToUpdateBarPosition();
       updateStateList();
     });
     observer.observe(rootRef.current);
@@ -224,7 +355,13 @@ export const ResizableStack = ({
     return () => {
       observer.disconnect();
     };
-  }, [direction, rootRef, updateStateList, mutateStateToSpreadExtraSize]);
+  }, [
+    direction,
+    rootRef,
+    updateStateList,
+    mutateStateToSpreadExtraSize,
+    mutateStateToUpdateBarPosition,
+  ]);
 
   return (
     <div
@@ -239,6 +376,7 @@ export const ResizableStack = ({
           {child.resizeBar != null && (
             <ResizableStackBar
               direction={direction}
+              position={child.resizeBar.position}
               writingModes={writingModes}
               size={barSize}
               onResizing={child.resizeBar.onResizing}

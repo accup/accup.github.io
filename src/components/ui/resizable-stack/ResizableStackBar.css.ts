@@ -23,16 +23,54 @@ export const root = style([
   },
 ]);
 export const rootIs = styleVariants({
+  horizontal: {
+    vars: {
+      [vars.root.cursor]: "col-resize",
+    },
+  },
+  horizontalLeftEnd: {
+    vars: {
+      [vars.root.cursor]: "col-resize",
+    },
+  },
+  horizontalRightEnd: {
+    vars: {
+      [vars.root.cursor]: "col-resize",
+    },
+  },
+  horizontalBothEnd: {
+    vars: {
+      [vars.root.cursor]: "not-allowed",
+    },
+  },
+  vertical: {
+    vars: {
+      [vars.root.cursor]: "row-resize",
+    },
+  },
+  verticalTopEnd: {
+    vars: {
+      [vars.root.cursor]: "row-resize",
+    },
+  },
+  verticalBottomEnd: {
+    vars: {
+      [vars.root.cursor]: "row-resize",
+    },
+  },
+  verticalBothEnd: {
+    vars: {
+      [vars.root.cursor]: "not-allowed",
+    },
+  },
   row: {
     vars: {
       [vars.root.borderInline]: `1px solid ${theme.color.bgPrimary}`,
-      [vars.root.cursor]: "col-resize",
     },
   },
   column: {
     vars: {
       [vars.root.borderBlock]: `1px solid ${theme.color.bgPrimary}`,
-      [vars.root.cursor]: "row-resize",
     },
   },
 });
