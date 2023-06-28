@@ -210,39 +210,67 @@ export const ResizableStack = ({
     (fullSize: number) => {
       const stateMap = stateMapRef.current;
 
-      const states = Array.from(stateMap.values());
+      const totalBarSize = barSize * Math.max(0, stateMap.size - 1);
 
-      const totalItemBasis = states.reduce(
-        (sub, state) => sub + state.minSize,
-        0
-      );
-      const totalItemFlex = states.reduce(
-        (sub, state) => sub + state.size - state.minSize,
-        0
-      );
-      const totalItemSize = totalItemBasis + totalItemFlex;
+      let undeterminedStates = Array.from(stateMap.values());
+      let undeterminedFullSize = fullSize - totalBarSize;
 
-      const totalBarBasis = barSize * Math.max(0, stateMap.size - 1);
-      const totalBarSize = totalBarBasis;
+      const maxTrials = undeterminedStates.length;
 
-      const totalSize = totalItemSize + totalBarSize;
+      for (let trial = 0; trial < maxTrials; ++trial) {
+        if (undeterminedStates.length <= 0) break;
 
-      const freeSize = fullSize - totalSize;
-
-      let subtotalItemSize = 0;
-      states.forEach((state) => {
-        const nextSubtotalItemSize = subtotalItemSize + state.size;
-
-        const lower = Math.floor((freeSize * subtotalItemSize) / totalItemSize);
-        const upper = Math.floor(
-          (freeSize * nextSubtotalItemSize) / totalItemSize
+        const totalItemSize = undeterminedStates.reduce(
+          (sub, state) => sub + state.size,
+          0
         );
 
-        subtotalItemSize = nextSubtotalItemSize;
+        const freeSize = undeterminedFullSize - totalItemSize;
 
-        const extraSize = Math.max(upper - lower, state.minSize - state.size);
-        state.extraSize = extraSize;
-      });
+        const remainingUndeterminedStates = undeterminedStates.filter(
+          (state, index) => {
+            const lower = Math.floor(
+              (freeSize * index) / undeterminedStates.length
+            );
+            const upper = Math.floor(
+              (freeSize * (index + 1)) / undeterminedStates.length
+            );
+
+            let isDetermined = false;
+
+            const preferredExtraSize = upper - lower;
+            let extraSize = preferredExtraSize;
+
+            const minExtraSize = state.minSize - state.size;
+            if (extraSize < minExtraSize) {
+              extraSize = minExtraSize;
+              isDetermined = true;
+            }
+
+            if (state.maxSize != null) {
+              const maxExtraSize = state.maxSize - state.size;
+              if (extraSize > maxExtraSize) {
+                extraSize = maxExtraSize;
+                isDetermined = true;
+              }
+            }
+
+            state.extraSize = extraSize;
+
+            if (isDetermined) {
+              undeterminedFullSize -= state.size + extraSize;
+            }
+
+            const isUndetermined = !isDetermined;
+            return isUndetermined;
+          }
+        );
+
+        if (remainingUndeterminedStates.length === undeterminedStates.length)
+          break;
+
+        undeterminedStates = remainingUndeterminedStates;
+      }
     },
     [stateMapRef, barSize]
   );
