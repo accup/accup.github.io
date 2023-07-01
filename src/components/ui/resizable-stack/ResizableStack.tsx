@@ -171,6 +171,13 @@ export const ResizableStack = ({
           -formerState.size,
           -(formerState.size - formerState.minSize)
         );
+
+        if (formerState.maxSize != null) {
+          lengthwiseShift = Math.min(
+            lengthwiseShift,
+            -(formerState.size - formerState.maxSize)
+          );
+        }
       }
       if (latterState != null) {
         lengthwiseShift = Math.min(
@@ -178,6 +185,13 @@ export const ResizableStack = ({
           latterState.size,
           latterState.size - latterState.minSize
         );
+
+        if (latterState.maxSize != null) {
+          lengthwiseShift = Math.max(
+            lengthwiseShift,
+            latterState.size - latterState.maxSize
+          );
+        }
       }
 
       if (formerState != null) {
