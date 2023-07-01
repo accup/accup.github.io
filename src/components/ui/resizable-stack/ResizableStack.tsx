@@ -22,13 +22,13 @@ export type ResizableStackItem = {
   /** identity */
   key: string;
   /** frame contents */
-  children: ReactNode;
+  children: () => ReactNode;
   /** initial determined space */
   initialSize: number;
   /** lower space constraint */
-  minSize?: number;
+  minSize?: number | undefined;
   /** lower space constraint */
-  maxSize?: number;
+  maxSize?: number | undefined;
 };
 
 type ChildState = Omit<ResizableStackItem, "minSize"> & {
@@ -58,7 +58,7 @@ export const ResizableStack = ({
 }: {
   direction: ResizableStackDirection;
   children: readonly ResizableStackItem[];
-  barSize?: number;
+  barSize?: number | undefined;
 }) => {
   const rootRef = useRef<HTMLDivElement>(null);
   const writingModes = useWritingModes(rootRef);
@@ -438,7 +438,7 @@ export const ResizableStack = ({
                   : undefined,
             }}
           >
-            {child.children}
+            {<child.children />}
           </div>
         </Fragment>
       ))}
