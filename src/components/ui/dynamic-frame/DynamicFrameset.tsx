@@ -301,7 +301,7 @@ function makeAndMeasureStackNode(
   };
 }
 
-export const DynamicFrameset = ({
+export function DynamicFrameset({
   minRowSize,
   maxRowSize,
   minColumnSize,
@@ -317,7 +317,7 @@ export const DynamicFrameset = ({
   initialFramesetState?: DynamicFramesetState;
   onFrameRequested?: DynamicFramesetOnFrameRequested;
   OnFramesetStateChanged?: DynamicFramesetOnFramesetStateChanged;
-}) => {
+}) {
   const [framesetState, setFramesetState] = useState<DynamicFramesetState>();
   const [frameMap, setFrameMap] = useState<DynamicFrameMap>(() => new Map());
 
@@ -378,4 +378,4 @@ export const DynamicFrameset = ({
   );
 
   return <StackNode />;
-};
+}

@@ -7,13 +7,14 @@ import {
 } from "./ResizableStackBar";
 import classNames from "classnames";
 import {
-  type ReactNode,
   Fragment,
   useState,
   useEffect,
   useMemo,
   useRef,
   useCallback,
+  ReactNode,
+  memo,
 } from "react";
 
 type ResizableStackDirection = "row" | "column";
@@ -51,7 +52,9 @@ type ChildState = Omit<ResizableStackItem, "minSize"> & {
     | undefined;
 };
 
-export const ResizableStack = ({
+const MemoResizableStackBar = memo(ResizableStackBar);
+
+export function ResizableStack({
   direction,
   children,
   barSize = 6,
@@ -59,7 +62,7 @@ export const ResizableStack = ({
   direction: ResizableStackDirection;
   children: readonly ResizableStackItem[];
   barSize?: number | undefined;
-}) => {
+}) {
   const rootRef = useRef<HTMLDivElement>(null);
   const writingModes = useWritingModes(rootRef);
 
@@ -416,7 +419,7 @@ export const ResizableStack = ({
       {stateList?.map((child) => (
         <Fragment key={child.key}>
           {child.resizeBar != null && (
-            <ResizableStackBar
+            <MemoResizableStackBar
               direction={direction}
               position={child.resizeBar.position}
               writingModes={writingModes}
@@ -444,4 +447,4 @@ export const ResizableStack = ({
       ))}
     </div>
   );
-};
+}
