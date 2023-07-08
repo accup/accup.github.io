@@ -8,7 +8,7 @@ export type DynamicFrame = {
   key: string;
   children: (() => ReactNode) | undefined;
 };
-type DynamicFrameMap = Map<string, DynamicFrame>;
+export type DynamicFrameMap = Map<string, DynamicFrame>;
 
 export type DynamicFrameState = {
   key: string;
@@ -114,15 +114,18 @@ type MakeTreeOptions = {
   maxColumnSize?: number | undefined;
 };
 
-type FrameEntryMetrics = {
+export type DynamicFrameEntryMetrics = {
   minRowSize: number | null;
   maxRowSize: number | null;
   minColumnSize: number | null;
   maxColumnSize: number | null;
 };
+export type DynamicFrameMetricsChangedCallback = (
+  metrics: DynamicFrameEntryMetrics
+) => void;
 
 type MakeAndMeasureResult<T> = {
-  metrics: FrameEntryMetrics;
+  metrics: DynamicFrameEntryMetrics;
   item: T;
 };
 
@@ -216,7 +219,7 @@ function makeAndMeasureStackNode(
     return item;
   });
 
-  const metrics = children.reduce<FrameEntryMetrics>(
+  const metrics = children.reduce<DynamicFrameEntryMetrics>(
     (
       {
         minRowSize: subMinRowSize,
