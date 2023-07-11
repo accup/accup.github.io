@@ -1,78 +1,104 @@
 import {
-  ResizableStack,
-  ResizableStackItem,
-} from "../../ui/resizable-stack/ResizableStack";
+  DynamicFrameset,
+  DynamicFramesetOnFrameRequested,
+  DynamicFramesetState,
+} from "../../ui/dynamic-frame/DynamicFrameset";
 import * as classes from "./WavePresentation.css";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+
+const SomeComponent = ({ initialCount }: { initialCount: number }) => {
+  const [count, setCount] = useState(initialCount);
+
+  const handleClick = useCallback(() => {
+    setCount((prevValue) => prevValue + 1);
+  }, [setCount]);
+
+  return (
+    <button
+      type="button"
+      style={{
+        fontSize: 16,
+        color: "inherit",
+        background: "none",
+        blockSize: "100%",
+        inlineSize: "100%",
+      }}
+      onClick={handleClick}
+    >
+      {count.toString(16)}
+    </button>
+  );
+};
 
 export function WavePresentation() {
-  const [children, setChildren] = useState<readonly ResizableStackItem[]>([]);
+  const handleFrameRequested = useCallback<DynamicFramesetOnFrameRequested>(
+    (key) => {
+      let initialCount = parseInt(key, 16);
+      if (Number.isNaN(initialCount)) {
+        initialCount = 0;
+      }
 
-  const resortChildren = useCallback(
-    (...order: readonly string[]) => {
-      setChildren((prev) =>
-        order
-          .map((key) => prev.find((child) => child.key === key))
-          .filter((child): child is NonNullable<typeof child> => child != null)
-      );
+      return () => <SomeComponent initialCount={initialCount} />;
     },
-    [setChildren]
+    []
   );
 
-  useEffect(() => {
-    setChildren([
-      {
-        key: "0",
-        initialSize: 150,
-        children: (
-          <button
-            type="button"
-            onClick={() => resortChildren("1", "4", "2", "3", "0")}
-          >
-            1 - 4 - 2 - 3 - 0
-          </button>
-        ),
+  const initialFramesetState = useMemo<DynamicFramesetState>(
+    () => ({
+      root: {
+        direction: "row",
+        entries: [
+          {
+            type: "stack",
+            stack: {
+              direction: "row",
+              entries: [
+                { type: "frame", frame: { key: "0", size: 100 } },
+                { type: "frame", frame: { key: "1", size: 100 } },
+                { type: "frame", frame: { key: "2", size: 100 } },
+                {
+                  type: "stack",
+                  stack: {
+                    direction: "column",
+                    entries: [
+                      { type: "frame", frame: { key: "3", size: 100 } },
+                      { type: "frame", frame: { key: "4", size: 100 } },
+                      { type: "frame", frame: { key: "5", size: 100 } },
+                      { type: "frame", frame: { key: "6", size: 100 } },
+                    ],
+                  },
+                },
+                { type: "frame", frame: { key: "4", size: 100 } },
+              ],
+            },
+          },
+          {
+            type: "stack",
+            stack: {
+              direction: "column",
+              entries: [
+                { type: "frame", frame: { key: "7", size: 100 } },
+                { type: "frame", frame: { key: "8", size: 100 } },
+                { type: "frame", frame: { key: "9", size: 100 } },
+                { type: "frame", frame: { key: "A", size: 100 } },
+                { type: "frame", frame: { key: "B", size: 100 } },
+              ],
+            },
+          },
+        ],
       },
-      {
-        key: "1",
-        initialSize: 150,
-        children: (
-          <button
-            type="button"
-            onClick={() => resortChildren("0", "1", "2", "3", "4")}
-          >
-            0 - 1 - 2 - 3 - 4
-          </button>
-        ),
-      },
-      {
-        key: "2",
-        initialSize: 150,
-        children: (
-          <button
-            type="button"
-            onClick={() => resortChildren("0", "3", "4", "1", "2")}
-          >
-            0 - 3 - 4 - 1 - 2
-          </button>
-        ),
-      },
-      {
-        key: "3",
-        initialSize: 150,
-        children: <span>3</span>,
-      },
-      {
-        key: "4",
-        initialSize: 150,
-        children: <span>4</span>,
-      },
-    ]);
-  }, [setChildren, resortChildren]);
+    }),
+    []
+  );
 
   return (
     <div className={classes.root}>
-      <ResizableStack direction="column">{children}</ResizableStack>
+      <DynamicFrameset
+        minRowSize={10}
+        minColumnSize={10}
+        initialFramesetState={initialFramesetState}
+        onFrameRequested={handleFrameRequested}
+      ></DynamicFrameset>
     </div>
   );
 }

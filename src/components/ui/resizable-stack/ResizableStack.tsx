@@ -7,13 +7,14 @@ import {
 } from "./ResizableStackBar";
 import classNames from "classnames";
 import {
-  type ReactNode,
   Fragment,
   useState,
   useEffect,
   useMemo,
   useRef,
   useCallback,
+  ReactNode,
+  memo,
 } from "react";
 
 type ResizableStackDirection = "row" | "column";
@@ -22,13 +23,13 @@ export type ResizableStackItem = {
   /** identity */
   key: string;
   /** frame contents */
-  children: ReactNode;
+  children: () => ReactNode;
   /** initial determined space */
   initialSize: number;
   /** lower space constraint */
-  minSize?: number;
+  minSize?: number | undefined;
   /** lower space constraint */
-  maxSize?: number;
+  maxSize?: number | undefined;
 };
 
 type ChildState = Omit<ResizableStackItem, "minSize"> & {
@@ -51,15 +52,17 @@ type ChildState = Omit<ResizableStackItem, "minSize"> & {
     | undefined;
 };
 
-export const ResizableStack = ({
+const MemoResizableStackBar = memo(ResizableStackBar);
+
+export function ResizableStack({
   direction,
   children,
   barSize = 6,
 }: {
   direction: ResizableStackDirection;
   children: readonly ResizableStackItem[];
-  barSize?: number;
-}) => {
+  barSize?: number | undefined;
+}) {
   const rootRef = useRef<HTMLDivElement>(null);
   const writingModes = useWritingModes(rootRef);
 
@@ -171,6 +174,13 @@ export const ResizableStack = ({
           -formerState.size,
           -(formerState.size - formerState.minSize)
         );
+
+        if (formerState.maxSize != null) {
+          lengthwiseShift = Math.min(
+            lengthwiseShift,
+            -(formerState.size - formerState.maxSize)
+          );
+        }
       }
       if (latterState != null) {
         lengthwiseShift = Math.min(
@@ -178,6 +188,13 @@ export const ResizableStack = ({
           latterState.size,
           latterState.size - latterState.minSize
         );
+
+        if (latterState.maxSize != null) {
+          lengthwiseShift = Math.max(
+            lengthwiseShift,
+            latterState.size - latterState.maxSize
+          );
+        }
       }
 
       if (formerState != null) {
@@ -402,7 +419,7 @@ export const ResizableStack = ({
       {stateList?.map((child) => (
         <Fragment key={child.key}>
           {child.resizeBar != null && (
-            <ResizableStackBar
+            <MemoResizableStackBar
               direction={direction}
               position={child.resizeBar.position}
               writingModes={writingModes}
@@ -424,10 +441,10 @@ export const ResizableStack = ({
                   : undefined,
             }}
           >
-            {child.children}
+            {<child.children />}
           </div>
         </Fragment>
       ))}
     </div>
   );
-};
+}
