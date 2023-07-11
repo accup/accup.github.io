@@ -1,0 +1,172 @@
+---
+import DefaultLayout from "../../../layouts/DefaultLayout.astro";
+import * as classes from "./edit.astro.css";
+---
+
+<script>
+  const templates = {
+    output: document.getElementById("template-output"),
+    code: document.getElementById("template-code"),
+  };
+
+  function cloneTemplate(template: Element | null) {
+    if (!(template instanceof HTMLTemplateElement)) return null;
+
+    return template.content.firstElementChild?.cloneNode(true);
+  }
+
+  function text(text: string) {
+    return document.createTextNode(text);
+  }
+  function label(nodes: readonly Node[]) {
+    const label = document.createElement("label");
+    nodes.forEach((node) => label.appendChild(node));
+    return label;
+  }
+  function output(nodes: readonly Node[]) {
+    const output = cloneTemplate(templates.output);
+    if (!(output instanceof HTMLOutputElement)) {
+      throw new Error("Unexpected type");
+    }
+
+    nodes.forEach((node) => output.appendChild(node));
+    return output;
+  }
+  function code(nodes: readonly Node[]) {
+    const code = cloneTemplate(templates.code);
+    if (!(code instanceof HTMLElement)) {
+      throw new Error("Unexpected type");
+    }
+
+    nodes.forEach((node) => code.appendChild(node));
+    return code;
+  }
+
+  const testers: readonly {
+    id: string;
+    label: () => readonly Node[];
+    register: (input: HTMLInputElement, output: HTMLOutputElement) => void;
+  }[] = [
+    {
+      id: "the-first-script-run",
+      label: () => [text("the first script run")],
+      register: (input, output) => {
+        output.textContent = input.value;
+      },
+    },
+    {
+      id: "a-single-request-animation-frame-call",
+      label: () => [
+        text("a single "),
+        code([text("requestAnimationFrame")]),
+        text(" call"),
+      ],
+      register: (input, output) => {
+        requestAnimationFrame(() => {
+          output.textContent = input.value;
+        });
+      },
+    },
+    {
+      id: "double-request-animation-frame-calls",
+      label: () => [
+        text("double "),
+        code([text("requestAnimationFrame")]),
+        text(" calls"),
+      ],
+      register: (input, output) => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            output.textContent = input.value;
+          });
+        });
+      },
+    },
+    {
+      id: "input-event",
+      label: () => [code([text("input")]), text(" event")],
+      register: (input, output) => {
+        input.addEventListener("input", () => {
+          output.textContent = input.value;
+        });
+      },
+    },
+    {
+      id: "change-event",
+      label: () => [code([text("change")]), text(" event")],
+      register: (input, output) => {
+        input.addEventListener("change", () => {
+          output.textContent = input.value;
+        });
+      },
+    },
+  ];
+
+  const outputs = document.getElementById("outputs");
+
+  const foo = document.getElementById("foo");
+  if (foo instanceof HTMLInputElement && outputs instanceof HTMLElement) {
+    testers.forEach((tester) => {
+      const out = output([]);
+      out.id = `foo-on-${tester.id}`;
+
+      outputs.appendChild(
+        label([out, document.createTextNode(": Foo on "), ...tester.label()])
+      );
+
+      tester.register(foo, out);
+    });
+  }
+
+  const bar = document.getElementById("bar");
+  if (bar instanceof HTMLInputElement && outputs instanceof HTMLElement) {
+    testers.forEach((tester) => {
+      const out = output([]);
+      out.id = `bar-on-${tester.id}`;
+
+      outputs.appendChild(
+        label([out, document.createTextNode(": Bar on "), ...tester.label()])
+      );
+
+      tester.register(bar, out);
+    });
+  }
+</script>
+
+<DefaultLayout title="Edit">
+  <template id="template-output">
+    <output class:list={classes.output}></output>
+  </template>
+  <template id="template-code">
+    <code class:list={classes.code}></code>
+  </template>
+
+  <form action="/ground/form/preview" class:list={classes.root}>
+    <fieldset id="outputs" class:list={classes.fieldset}>
+      <legend>Output</legend>
+    </fieldset>
+
+    <fieldset class:list={classes.fieldset}>
+      <legend>Input</legend>
+
+      <label>
+        Foo: <input id="foo" name="foo" type="text" value="" />
+      </label>
+
+      <label>
+        Bar: <input
+          id="bar"
+          name="bar"
+          type="text"
+          value=""
+          autocomplete="off"
+        />
+        (No autocomplete)
+      </label>
+    </fieldset>
+
+    <fieldset class:list={classes.fieldset}>
+      <button type="submit">Submit</button>
+    </fieldset>
+  </form>
+</DefaultLayout>
