@@ -1,5 +1,5 @@
 import { useWritingModes } from "../../../hooks/logical-property/useWritingMode";
-import * as classes from "../resizable-stack/ResizableStack.css";
+import * as classes from "./ResizableStack.css";
 import {
   ResizableStackBar,
   ResizableStackBarPosition,

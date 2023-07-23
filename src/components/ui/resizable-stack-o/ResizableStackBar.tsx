@@ -1,8 +1,14 @@
 import { useLogicalConverter } from "../../../hooks/logical-property/useLogicalConverter";
 import type { WritingModes } from "../../../hooks/logical-property/useWritingMode";
-import * as classes from "../resizable-stack/ResizableStackBar.css";
+import * as classes from "./ResizableStackBar.css";
 import classNames from "classnames";
-import { PointerEvent, useCallback, useMemo, useRef } from "react";
+import {
+  DOMAttributes,
+  PointerEvent,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 
 export type ResizableStackBarDirection = "row" | "column";
 export type ResizableStackBarPosition =
@@ -201,14 +207,18 @@ export function ResizableStackBar({
     }
   }, [direction, position, logicalConvert]);
 
+  const handlers = {
+    onPointerDown: handleResizeStart,
+    onPointerMove: handleResize,
+    onPointerCancel: handleResizeEnd,
+    onPointerUp: handleResizeEnd,
+  } satisfies Partial<DOMAttributes<HTMLDivElement>>;
+
   return (
     <div
       className={classNames(classes.root, classRootIs)}
       style={style}
-      onPointerDown={handleResizeStart}
-      onPointerMove={handleResize}
-      onPointerCancel={handleResizeEnd}
-      onPointerUp={handleResizeEnd}
+      {...handlers}
     />
   );
 }

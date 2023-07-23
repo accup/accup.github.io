@@ -1,7 +1,7 @@
 import {
   ResizableStack,
   type ResizableStackItem,
-} from "../resizable-stack/ResizableStack";
+} from "../resizable-stack-o/ResizableStack";
 import { useState, type ReactNode, useEffect, useMemo } from "react";
 
 export type DynamicFrame = {

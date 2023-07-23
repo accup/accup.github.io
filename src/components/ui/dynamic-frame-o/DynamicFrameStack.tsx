@@ -1,4 +1,4 @@
-import { ResizableStack } from "../resizable-stack/ResizableStack";
+import { ResizableStack } from "../resizable-stack-o/ResizableStack";
 import type {
   DynamicFrameMap,
   DynamicFrameMetricsChangedCallback,
