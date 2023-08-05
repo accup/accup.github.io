@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
-
-export type DynamicFramesetFrameRenderer<Props> = (props: Props) => ReactNode;
+export interface DynamicFramesetFrameComponentProps<TState = unknown> {
+  readonly state: TState;
+}
 
 export type DynamicFramesetFlow =
   | "top/left"
@@ -20,7 +20,9 @@ export type DynamicFramesetFlow =
   | "inline-end/block-start"
   | "inline-end/block-end";
 
-export interface DynamicFramesetState<Props> {
+export interface DynamicFramesetState<
+  TComponentProps extends DynamicFramesetFrameComponentProps
+> {
   /**
    * flow
    */
@@ -36,7 +38,7 @@ export interface DynamicFramesetState<Props> {
   /**
    * frames
    */
-  readonly frames: readonly DynamicFramesetFrameState<Props>[];
+  readonly frames: readonly DynamicFramesetFrameState<TComponentProps>[];
 }
 
 export interface DynamicFramesetLineState {
@@ -50,15 +52,17 @@ export interface DynamicFramesetLineState {
   readonly flex: number;
 }
 
-export interface DynamicFramesetFrameState<Props> {
+export interface DynamicFramesetFrameState<
+  TComponentProps extends DynamicFramesetFrameComponentProps
+> {
   /**
    * frame identifier
    */
   readonly id: string;
   /**
-   * frame props
+   * frame state
    */
-  readonly props: Props;
+  readonly state: TComponentProps["state"];
   /**
    * first row line number
    */

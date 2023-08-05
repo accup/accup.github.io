@@ -6,16 +6,45 @@ import { useDynamicFramesetReducer } from "../../ui/dynamic-frameset/useDynamicF
 
 import * as classes from "./WavePresentation.css";
 
-function SomeComponent({
-  flow,
-  setFlow,
-}: {
-  flow: DynamicFramesetFlow;
+interface SomeComponentProps {
+  readonly state: {
+    readonly id: string;
+    readonly flow: DynamicFramesetFlow;
+  };
   setFlow: (flow: DynamicFramesetFlow) => void;
-}) {
+  setFrameState: (id: string, state: SomeComponentProps["state"]) => void;
+}
+
+function SomeComponent({ state, setFlow, setFrameState }: SomeComponentProps) {
+  const { id, flow } = state;
+
   const handleClick = useCallback(() => {
     setFlow(flow);
-  }, [flow, setFlow]);
+    setFrameState(id, {
+      ...state,
+      flow:
+        (
+          [
+            "top/left",
+            "top/right",
+            "bottom/left",
+            "bottom/right",
+            "left/top",
+            "left/bottom",
+            "right/top",
+            "right/bottom",
+            "block-start/inline-start",
+            "block-start/inline-end",
+            "block-end/inline-start",
+            "block-end/inline-end",
+            "inline-start/block-start",
+            "inline-start/block-end",
+            "inline-end/block-start",
+            "inline-end/block-end",
+          ] as const
+        )[Math.floor(Math.random() * 16)] ?? "block-end/inline-end",
+    });
+  }, [state, id, flow, setFlow, setFrameState]);
 
   return (
     <button
@@ -36,7 +65,7 @@ function SomeComponent({
 }
 
 export function WavePresentation() {
-  const [dynamicFramesetState, dispatchDynamicFramesetState] =
+  const [dynamicFramesetState, dynamicFramesetStateActions] =
     useDynamicFramesetReducer<ComponentProps<typeof SomeComponent>>(() => ({
       flow: "block-start/inline-start",
       rows: [
@@ -52,7 +81,7 @@ export function WavePresentation() {
       columns: [
         { basis: 100, flex: 0 },
         { basis: 200, flex: 0 },
-        { basis: 300, flex: 0 },
+        { basis: 400, flex: 0 },
       ],
       frames: (
         [
@@ -75,11 +104,7 @@ export function WavePresentation() {
         ] satisfies readonly DynamicFramesetFlow[]
       ).map((flow, index) => ({
         id: flow,
-        props: {
-          flow,
-          setFlow: (flow) =>
-            dispatchDynamicFramesetState({ type: "change-flow", flow }),
-        },
+        state: { id: flow, flow },
         gridRowStart: index % 8,
         gridRowEnd: (index % 8) + 1,
         gridColumnStart: Math.floor(index / 8),
@@ -92,6 +117,10 @@ export function WavePresentation() {
       <DynamicFrameset
         state={dynamicFramesetState}
         FrameComponent={SomeComponent}
+        FrameComponentProps={{
+          setFlow: dynamicFramesetStateActions.changeFlow,
+          setFrameState: dynamicFramesetStateActions.setFrameState,
+        }}
       />
     </div>
   );

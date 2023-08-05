@@ -1,54 +1,54 @@
-import { useReducer } from "react";
+import { useMemo, useState } from "react";
 
 import type {
   DynamicFramesetFlow,
+  DynamicFramesetFrameComponentProps,
+  DynamicFramesetFrameState,
   DynamicFramesetState,
 } from "./DynamicFrameset.types";
 
-type DynamicFramesetAction<Props> =
-  | {
-      type: "reset";
-      state: DynamicFramesetState<Props>;
-    }
-  | {
-      type: "change-flow";
-      flow: DynamicFramesetFlow;
-    }
-  | {
-      type: "resize-container";
-      flowSize: number;
-    }
-  | {
-      type: "move-resize-bar";
-      identifier: string;
-    };
-
-export function useDynamicFramesetReducer<RendererProps>(
-  initializer?: (() => DynamicFramesetState<RendererProps>) | undefined
-) {
-  const initialState: DynamicFramesetState<RendererProps> = initializer?.() ?? {
-    flow: "block-start/inline-start",
-    rows: [],
-    columns: [],
-    frames: [],
-  };
-
-  return useReducer(
-    (
-      prevState: DynamicFramesetState<RendererProps>,
-      action: DynamicFramesetAction<RendererProps>
-    ) => {
-      switch (action.type) {
-        case "change-flow":
-          return {
-            ...prevState,
-            flow: action.flow,
-          };
-
-        default:
-          return prevState;
+export function useDynamicFramesetReducer<
+  TComponentProps extends DynamicFramesetFrameComponentProps
+>(initializer?: (() => DynamicFramesetState<TComponentProps>) | undefined) {
+  const [state, setState] = useState<DynamicFramesetState<TComponentProps>>(
+    () =>
+      initializer?.() ?? {
+        flow: "block-start/inline-start",
+        rows: [],
+        columns: [],
+        frames: [],
       }
-    },
-    initialState
   );
+
+  const actions = useMemo(
+    () => ({
+      reset: (state: DynamicFramesetState<TComponentProps>) => {
+        setState(state);
+      },
+      setFrameState: (
+        id: string,
+        frameState: DynamicFramesetFrameState<TComponentProps>["state"]
+      ) => {
+        setState((prevState) => ({
+          ...prevState,
+          frames: prevState.frames.map((frame) => {
+            if (frame.id === id) {
+              return {
+                ...frame,
+                state: frameState,
+              };
+            } else {
+              return frame;
+            }
+          }),
+        }));
+      },
+      changeFlow: (flow: DynamicFramesetFlow) => {
+        setState((prevState) => ({ ...prevState, flow }));
+      },
+    }),
+    [setState]
+  );
+
+  return [state, actions] as const;
 }

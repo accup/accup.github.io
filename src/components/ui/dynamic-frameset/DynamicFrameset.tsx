@@ -1,19 +1,38 @@
 import classNames from "classnames";
-import { type CSSProperties, type ReactNode, useMemo } from "react";
+import {
+  type CSSProperties,
+  ComponentType,
+  type ReactNode,
+  useMemo,
+} from "react";
 
 import type {
   DynamicFramesetFlow,
-  DynamicFramesetFrameRenderer,
+  DynamicFramesetFrameComponentProps,
   DynamicFramesetFrameState,
   DynamicFramesetGrid,
   DynamicFramesetState,
 } from "./DynamicFrameset.types";
 import { useDynamicFramesetGrid } from "./useDynamicFramesetGrid";
 
-export interface DynamicFramesetProps<RendererProps> {
-  state: DynamicFramesetState<RendererProps>;
+type FrameComponentProps<
+  TFrameComponentProps extends DynamicFramesetFrameComponentProps
+> = Omit<TFrameComponentProps, "state">;
+
+type FrameComponent<
+  TFrameComponentProps extends DynamicFramesetFrameComponentProps
+> = ComponentType<
+  Pick<TFrameComponentProps, "state"> &
+    FrameComponentProps<TFrameComponentProps>
+>;
+
+export interface DynamicFramesetProps<
+  TFrameComponentProps extends DynamicFramesetFrameComponentProps
+> {
+  state: DynamicFramesetState<TFrameComponentProps>;
   classes?: DynamicFramesetClasses | undefined;
-  FrameComponent: DynamicFramesetFrameRenderer<RendererProps>;
+  FrameComponent: FrameComponent<TFrameComponentProps>;
+  FrameComponentProps: FrameComponentProps<TFrameComponentProps>;
 }
 
 interface DynamicFramesetClasses {
@@ -22,11 +41,14 @@ interface DynamicFramesetClasses {
   thumb?: string;
 }
 
-export function DynamicFrameset<RendererProps>({
+export function DynamicFrameset<
+  TFrameComponentProps extends DynamicFramesetFrameComponentProps
+>({
   state,
   classes,
   FrameComponent,
-}: DynamicFramesetProps<RendererProps>): ReactNode {
+  FrameComponentProps,
+}: DynamicFramesetProps<TFrameComponentProps>): ReactNode {
   const grid = useDynamicFramesetGrid(state);
 
   const rootStyle = useMemo<CSSProperties>(() => {
@@ -85,27 +107,34 @@ export function DynamicFrameset<RendererProps>({
           grid={grid}
           classes={classes}
           FrameComponent={FrameComponent}
+          FrameComponentProps={FrameComponentProps}
         />
       ))}
     </div>
   );
 }
 
-interface DynamicFramesetFrameProps<RendererProps> {
+interface DynamicFramesetFrameProps<
+  TFrameComponentProps extends DynamicFramesetFrameComponentProps
+> {
   flow: DynamicFramesetFlow;
-  frame: DynamicFramesetFrameState<RendererProps>;
+  frame: DynamicFramesetFrameState<TFrameComponentProps>;
   grid: DynamicFramesetGrid;
   classes?: DynamicFramesetClasses | undefined;
-  FrameComponent: DynamicFramesetFrameRenderer<RendererProps>;
+  FrameComponent: FrameComponent<TFrameComponentProps>;
+  FrameComponentProps: FrameComponentProps<TFrameComponentProps>;
 }
 
-function DynamicFramesetFrame<RendererProps>({
+function DynamicFramesetFrame<
+  TFrameComponentProps extends DynamicFramesetFrameComponentProps
+>({
   flow,
   frame,
   grid,
   classes,
   FrameComponent,
-}: DynamicFramesetFrameProps<RendererProps>) {
+  FrameComponentProps,
+}: DynamicFramesetFrameProps<TFrameComponentProps>) {
   const frameStyle = useMemo<CSSProperties>(() => {
     const { rowSize, columnSize, insetRowStart, insetColumnStart } =
       grid.getAreaRect({
@@ -228,7 +257,11 @@ function DynamicFramesetFrame<RendererProps>({
 
   return (
     <div className={classNames(classes?.frame)} style={frameStyle}>
-      <FrameComponent key={frame.id} {...frame.props} />
+      <FrameComponent
+        key={frame.id}
+        state={frame.state}
+        {...FrameComponentProps}
+      />
     </div>
   );
 }

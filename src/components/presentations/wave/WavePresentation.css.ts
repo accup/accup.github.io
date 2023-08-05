@@ -18,6 +18,11 @@ export const root = style([
   {
     blockSize: ["100vh", "100vb", "100dvb"],
     inlineSize: ["100vw", "100vi", "100dvi"],
+  },
+  {
+    overflow: "hidden",
+  },
+  {
     color: theme.color.fg,
     backgroundColor: theme.color.bg,
   },
