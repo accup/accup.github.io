@@ -15,38 +15,16 @@ interface SomeComponentProps {
   };
   setFlow: (flow: DynamicFramesetFlow) => void;
   setFrameState: (id: string, state: SomeComponentProps["state"]) => void;
+  changeGridArea: (id: string) => void;
 }
 
-function SomeComponent({ state, setFlow, setFrameState }: SomeComponentProps) {
+function SomeComponent({ state, setFlow, changeGridArea }: SomeComponentProps) {
   const { id, flow } = state;
 
   const handleClick = useCallback(() => {
     setFlow(flow);
-    setFrameState(id, {
-      ...state,
-      flow:
-        (
-          [
-            "top/left",
-            "top/right",
-            "bottom/left",
-            "bottom/right",
-            "left/top",
-            "left/bottom",
-            "right/top",
-            "right/bottom",
-            "block-start/inline-start",
-            "block-start/inline-end",
-            "block-end/inline-start",
-            "block-end/inline-end",
-            "inline-start/block-start",
-            "inline-start/block-end",
-            "inline-end/block-start",
-            "inline-end/block-end",
-          ] as const
-        )[Math.floor(Math.random() * 16)] ?? "block-end/inline-end",
-    });
-  }, [state, id, flow, setFlow, setFrameState]);
+    changeGridArea(id);
+  }, [id, flow, setFlow, changeGridArea]);
 
   return (
     <button
@@ -71,19 +49,31 @@ export function WavePresentation() {
     useDynamicFramesetReducer<ComponentProps<typeof SomeComponent>>(() => ({
       flow: "block-start/inline-start",
       rows: [
-        { basis: 70, flex: 0 },
-        { basis: 80, flex: 0 },
-        { basis: 90, flex: 0 },
         { basis: 100, flex: 0 },
-        { basis: 110, flex: 0 },
-        { basis: 120, flex: 0 },
-        { basis: 130, flex: 0 },
-        { basis: 140, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
       ],
       columns: [
         { basis: 100, flex: 0 },
-        { basis: 200, flex: 0 },
-        { basis: 400, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
+        { basis: 100, flex: 0 },
       ],
       frames: (
         [
@@ -114,6 +104,48 @@ export function WavePresentation() {
       })),
     }));
 
+  const handleChangeGridArea = useCallback(
+    (id: string) => {
+      const rows = dynamicFramesetState.rows.length;
+      const columns = dynamicFramesetState.columns.length;
+      (
+        [
+          "top/left",
+          "top/right",
+          "bottom/left",
+          "bottom/right",
+          "left/top",
+          "left/bottom",
+          "right/top",
+          "right/bottom",
+          "block-start/inline-start",
+          "block-start/inline-end",
+          "block-end/inline-start",
+          "block-end/inline-end",
+          "inline-start/block-start",
+          "inline-start/block-end",
+          "inline-end/block-start",
+          "inline-end/block-end",
+        ] satisfies readonly DynamicFramesetFlow[]
+      ).map((id) => {
+        const row = Math.floor(Math.random() * rows);
+        const column = Math.floor(Math.random() * columns);
+        const rowEnd = row + Math.floor(Math.random() * (rows - row)) + 1;
+        const columnEnd =
+          column + Math.floor(Math.random() * (columns - column)) + 1;
+
+        dynamicFramesetStateActions.setFrameGrid(
+          id,
+          row,
+          column,
+          rowEnd,
+          columnEnd
+        );
+      });
+    },
+    [dynamicFramesetState, dynamicFramesetStateActions]
+  );
+
   return (
     <div className={classes.root}>
       <DynamicFrameset
@@ -122,6 +154,10 @@ export function WavePresentation() {
         FrameComponentProps={{
           setFlow: dynamicFramesetStateActions.changeFlow,
           setFrameState: dynamicFramesetStateActions.setFrameState,
+          changeGridArea: handleChangeGridArea,
+        }}
+        classes={{
+          frame: classes.frame,
         }}
       />
     </div>

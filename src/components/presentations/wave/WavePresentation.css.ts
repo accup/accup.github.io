@@ -27,3 +27,10 @@ export const root = style([
     backgroundColor: theme.color.bg,
   },
 ]);
+
+export const frame = style([
+  {
+    transition: "0.3s ease-in-out",
+    transitionProperty: "inset, width, height, block-size, inline-size",
+  },
+]);
