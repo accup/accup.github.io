@@ -10,7 +10,10 @@ import type {
 export function useDynamicFramesetReducer<
   TComponentProps extends DynamicFramesetFrameComponentProps
 >(initializer?: (() => DynamicFramesetState<TComponentProps>) | undefined) {
-  const [state, setState] = useState<DynamicFramesetState<TComponentProps>>(
+  type State = DynamicFramesetState<TComponentProps>;
+  type FrameState = DynamicFramesetFrameState<TComponentProps>["state"];
+
+  const [state, setState] = useState<State>(
     () =>
       initializer?.() ?? {
         flow: "block-start/inline-start",
@@ -22,13 +25,10 @@ export function useDynamicFramesetReducer<
 
   const actions = useMemo(
     () => ({
-      reset: (state: DynamicFramesetState<TComponentProps>) => {
+      reset: (state: State) => {
         setState(state);
       },
-      setFrameState: (
-        id: string,
-        frameState: DynamicFramesetFrameState<TComponentProps>["state"]
-      ) => {
+      setFrameState: (id: string, frameState: FrameState) => {
         setState((prevState) => ({
           ...prevState,
           frames: prevState.frames.map((frame) => {
