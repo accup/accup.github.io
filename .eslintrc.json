@@ -47,6 +47,12 @@
   },
   "overrides": [
     {
+      "files": ["*.vue"],
+      "rules": {
+        "react-hooks/rules-of-hooks": "off"
+      }
+    },
+    {
       "files": ["*.astro"],
       "parser": "astro-eslint-parser",
       "parserOptions": {

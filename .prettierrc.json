@@ -7,12 +7,7 @@
       }
     },
     {
-      "files": [
-        "src/**/*.ts",
-        "src/**/*.tsx",
-        "src/**/*.astro",
-        "src/**/*.vue"
-      ],
+      "files": ["**/*.ts", "**/*.tsx", "**/*.astro", "**/*.vue"],
       "options": {
         "importOrderSeparation": true,
         "importOrderSortSpecifiers": true,

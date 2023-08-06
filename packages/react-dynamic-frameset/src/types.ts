@@ -1,8 +1,8 @@
-export interface DynamicFramesetFrameComponentProps<TState = unknown> {
+export interface FrameComponentProps<TState = unknown> {
   readonly state: TState;
 }
 
-export type DynamicFramesetFlow =
+export type FramesetFlow =
   | "top/left"
   | "top/right"
   | "bottom/left"
@@ -20,28 +20,26 @@ export type DynamicFramesetFlow =
   | "inline-end/block-start"
   | "inline-end/block-end";
 
-export interface DynamicFramesetState<
-  TComponentProps extends DynamicFramesetFrameComponentProps
-> {
+export interface FramesetState<TComponentProps extends FrameComponentProps> {
   /**
    * flow
    */
-  readonly flow: DynamicFramesetFlow;
+  readonly flow: FramesetFlow;
   /**
    * row lines
    */
-  readonly rows: readonly DynamicFramesetLineState[];
+  readonly rows: readonly LineState[];
   /**
    * column lines
    */
-  readonly columns: readonly DynamicFramesetLineState[];
+  readonly columns: readonly LineState[];
   /**
    * frames
    */
-  readonly frames: readonly DynamicFramesetFrameState<TComponentProps>[];
+  readonly frames: readonly FrameState<TComponentProps>[];
 }
 
-export interface DynamicFramesetLineState {
+export interface LineState {
   /**
    * determined space
    */
@@ -52,9 +50,7 @@ export interface DynamicFramesetLineState {
   readonly flex: number;
 }
 
-export interface DynamicFramesetFrameState<
-  TComponentProps extends DynamicFramesetFrameComponentProps
-> {
+export interface FrameState<TComponentProps extends FrameComponentProps> {
   /**
    * frame identifier
    */
@@ -97,7 +93,7 @@ export interface DynamicFramesetFrameState<
   readonly maxColumnSize?: number | undefined;
 }
 
-export interface DynamicFramesetGrid {
+export interface FramesetGrid {
   getFullSize(this: void): {
     fullRowSize: number;
     fullColumnSize: number;

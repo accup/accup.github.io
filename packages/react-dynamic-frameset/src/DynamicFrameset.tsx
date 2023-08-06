@@ -6,33 +6,30 @@ import {
   useMemo,
 } from "react";
 
+import { getFramesetSizeStyles } from "./DynamicFrameset.utils";
 import type {
-  DynamicFramesetFlow,
-  DynamicFramesetFrameComponentProps,
-  DynamicFramesetFrameState,
-  DynamicFramesetGrid,
-  DynamicFramesetState,
-} from "./DynamicFrameset.types";
-import { useDynamicFramesetGrid } from "./useDynamicFramesetGrid";
+  FrameComponentProps,
+  FrameState,
+  FramesetFlow,
+  FramesetGrid,
+  FramesetState,
+} from "./types";
+import { useFramesetGrid } from "./useFramesetGrid";
 
-type FrameComponentProps<
-  TFrameComponentProps extends DynamicFramesetFrameComponentProps
-> = Omit<TFrameComponentProps, "state">;
-
-type FrameComponent<
-  TFrameComponentProps extends DynamicFramesetFrameComponentProps
-> = ComponentType<
-  Pick<TFrameComponentProps, "state"> &
-    FrameComponentProps<TFrameComponentProps>
+type FrameComponentPropsWithoutState<TProps extends FrameComponentProps> = Omit<
+  TProps,
+  "state"
 >;
 
-export interface DynamicFramesetProps<
-  TFrameComponentProps extends DynamicFramesetFrameComponentProps
-> {
-  state: DynamicFramesetState<TFrameComponentProps>;
+type FrameComponent<TProps extends FrameComponentProps> = ComponentType<
+  Pick<TProps, "state"> & FrameComponentPropsWithoutState<TProps>
+>;
+
+export interface DynamicFramesetProps<TProps extends FrameComponentProps> {
+  state: FramesetState<TProps>;
   classes?: DynamicFramesetClasses | undefined;
-  FrameComponent: FrameComponent<TFrameComponentProps>;
-  FrameComponentProps: FrameComponentProps<TFrameComponentProps>;
+  FrameComponent: FrameComponent<TProps>;
+  FrameComponentProps: FrameComponentPropsWithoutState<TProps>;
 }
 
 interface DynamicFramesetClasses {
@@ -41,54 +38,23 @@ interface DynamicFramesetClasses {
   thumb?: string;
 }
 
-export function DynamicFrameset<
-  TFrameComponentProps extends DynamicFramesetFrameComponentProps
->({
+export function DynamicFrameset<TProps extends FrameComponentProps>({
   state,
   classes,
   FrameComponent,
   FrameComponentProps,
-}: DynamicFramesetProps<TFrameComponentProps>): ReactNode {
-  const grid = useDynamicFramesetGrid(state);
+}: DynamicFramesetProps<TProps>): ReactNode {
+  const grid = useFramesetGrid(state);
 
   const rootStyle = useMemo<CSSProperties>(() => {
     const { fullRowSize, fullColumnSize } = grid.getFullSize();
-    const sizeStyles: CSSProperties = (() => {
-      switch (state.flow) {
-        case "left/top":
-        case "left/bottom":
-        case "right/top":
-        case "right/bottom":
-          return {
-            width: fullRowSize,
-            height: fullColumnSize,
-          };
-        case "top/left":
-        case "top/right":
-        case "bottom/left":
-        case "bottom/right":
-          return {
-            width: fullColumnSize,
-            height: fullRowSize,
-          };
-        case "block-start/inline-start":
-        case "block-start/inline-end":
-        case "block-end/inline-start":
-        case "block-end/inline-end":
-          return {
-            blockSize: fullRowSize,
-            inlineSize: fullColumnSize,
-          };
-        case "inline-start/block-start":
-        case "inline-start/block-end":
-        case "inline-end/block-start":
-        case "inline-end/block-end":
-          return {
-            blockSize: fullColumnSize,
-            inlineSize: fullRowSize,
-          };
-      }
-    })();
+
+    const sizeStyles: CSSProperties = getFramesetSizeStyles(
+      state.flow,
+      fullRowSize,
+      fullColumnSize
+    );
+
     return {
       display: "flow-root",
       isolation: "isolate",
@@ -114,27 +80,23 @@ export function DynamicFrameset<
   );
 }
 
-interface DynamicFramesetFrameProps<
-  TFrameComponentProps extends DynamicFramesetFrameComponentProps
-> {
-  flow: DynamicFramesetFlow;
-  frame: DynamicFramesetFrameState<TFrameComponentProps>;
-  grid: DynamicFramesetGrid;
+interface DynamicFramesetFrameProps<TProps extends FrameComponentProps> {
+  flow: FramesetFlow;
+  frame: FrameState<TProps>;
+  grid: FramesetGrid;
   classes?: DynamicFramesetClasses | undefined;
-  FrameComponent: FrameComponent<TFrameComponentProps>;
-  FrameComponentProps: FrameComponentProps<TFrameComponentProps>;
+  FrameComponent: FrameComponent<TProps>;
+  FrameComponentProps: FrameComponentPropsWithoutState<TProps>;
 }
 
-function DynamicFramesetFrame<
-  TFrameComponentProps extends DynamicFramesetFrameComponentProps
->({
+function DynamicFramesetFrame<TProps extends FrameComponentProps>({
   flow,
   frame,
   grid,
   classes,
   FrameComponent,
   FrameComponentProps,
-}: DynamicFramesetFrameProps<TFrameComponentProps>) {
+}: DynamicFramesetFrameProps<TProps>) {
   const frameStyle = useMemo<CSSProperties>(() => {
     const { rowSize, columnSize, insetRowStart, insetColumnStart } =
       grid.getAreaRect({
