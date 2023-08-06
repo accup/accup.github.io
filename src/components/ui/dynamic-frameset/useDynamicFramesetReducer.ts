@@ -1,16 +1,16 @@
 import { useMemo, useState } from "react";
 
 import type {
-  FrameComponentProps,
-  FrameState,
-  FramesetFlow,
-  FramesetState,
-} from "./types";
+  DynamicFramesetFlow,
+  DynamicFramesetFrameComponentProps,
+  DynamicFramesetFrameState,
+  DynamicFramesetState,
+} from "./DynamicFrameset.types";
 
 export function useDynamicFramesetReducer<
-  TComponentProps extends FrameComponentProps
->(initializer?: (() => FramesetState<TComponentProps>) | undefined) {
-  const [state, setState] = useState<FramesetState<TComponentProps>>(
+  TComponentProps extends DynamicFramesetFrameComponentProps
+>(initializer?: (() => DynamicFramesetState<TComponentProps>) | undefined) {
+  const [state, setState] = useState<DynamicFramesetState<TComponentProps>>(
     () =>
       initializer?.() ?? {
         flow: "block-start/inline-start",
@@ -22,12 +22,12 @@ export function useDynamicFramesetReducer<
 
   const actions = useMemo(
     () => ({
-      reset: (state: FramesetState<TComponentProps>) => {
+      reset: (state: DynamicFramesetState<TComponentProps>) => {
         setState(state);
       },
       setFrameState: (
         id: string,
-        frameState: FrameState<TComponentProps>["state"]
+        frameState: DynamicFramesetFrameState<TComponentProps>["state"]
       ) => {
         setState((prevState) => ({
           ...prevState,
@@ -43,7 +43,7 @@ export function useDynamicFramesetReducer<
           }),
         }));
       },
-      changeFlow: (flow: FramesetFlow) => {
+      changeFlow: (flow: DynamicFramesetFlow) => {
         setState((prevState) => ({ ...prevState, flow }));
       },
     }),

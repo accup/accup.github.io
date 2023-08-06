@@ -1,9 +1,10 @@
+import { ComponentProps, useCallback } from "react";
+
 import {
   DynamicFrameset,
   type DynamicFramesetFlow,
   useDynamicFramesetReducer,
-} from "@accup/react-dynamic-frameset";
-import { ComponentProps, useCallback } from "react";
+} from "../../ui/dynamic-frameset";
 
 import * as classes from "./WavePresentation.css";
 

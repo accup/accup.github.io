@@ -1,13 +1,15 @@
 import { useMemo } from "react";
 
 import type {
-  FrameComponentProps,
-  FramesetGrid,
-  FramesetState,
-  LineState,
-} from "./types";
+  DynamicFramesetFrameComponentProps,
+  DynamicFramesetGrid,
+  DynamicFramesetLineState,
+  DynamicFramesetState,
+} from "./DynamicFrameset.types";
 
-function* lineSteps(lines: readonly LineState[]): Iterable<number> {
+function* lineSteps(
+  lines: readonly DynamicFramesetLineState[]
+): Iterable<number> {
   let lastStep = 0;
 
   yield lastStep;
@@ -19,10 +21,10 @@ function* lineSteps(lines: readonly LineState[]): Iterable<number> {
   }
 }
 
-export function useFramesetGrid<TComponentProps extends FrameComponentProps>(
-  state: FramesetState<TComponentProps>
-): FramesetGrid {
-  return useMemo<FramesetGrid>(() => {
+export function useDynamicFramesetGrid<
+  TComponentProps extends DynamicFramesetFrameComponentProps
+>(state: DynamicFramesetState<TComponentProps>): DynamicFramesetGrid {
+  return useMemo<DynamicFramesetGrid>(() => {
     const rowSteps = [...lineSteps(state.rows)];
     const columnSteps = [...lineSteps(state.columns)];
     const maxRow = rowSteps.length - 1;
