@@ -2,8 +2,8 @@ import { useWritingModes } from "../../../hooks/logical-property/useWritingMode"
 import * as classes from "./ResizableStack.css";
 import {
   ResizableStackBar,
-  ResizableStackBarPosition,
-  ResizeDetails,
+  type ResizableStackBarPosition,
+  type ResizeDetails,
 } from "./ResizableStackBar";
 import classNames from "classnames";
 import {
@@ -13,7 +13,7 @@ import {
   useMemo,
   useRef,
   useCallback,
-  ReactNode,
+  type ReactNode,
   memo,
 } from "react";
 
@@ -83,13 +83,13 @@ export function ResizableStack({
         pendingSize: initialSize,
       };
     },
-    []
+    [],
   );
 
   const getBarPosition = useCallback(
     (
       formerState: ChildState,
-      latterState: ChildState
+      latterState: ChildState,
     ): ResizableStackBarPosition => {
       const formerMinSize = formerState.minSize;
       const formerMaxSize = formerState.maxSize;
@@ -124,7 +124,7 @@ export function ResizableStack({
         }
       }
     },
-    []
+    [],
   );
 
   const updateStateList = useCallback(() => {
@@ -133,7 +133,7 @@ export function ResizableStack({
     setStateList(
       children
         .map((child) => stateMap.get(child.key))
-        .filter((state): state is ChildState => state != null)
+        .filter((state): state is ChildState => state != null),
     );
   }, [children, stateMapRef]);
 
@@ -172,13 +172,13 @@ export function ResizableStack({
         lengthwiseShift = Math.max(
           lengthwiseShift,
           -formerState.size,
-          -(formerState.size - formerState.minSize)
+          -(formerState.size - formerState.minSize),
         );
 
         if (formerState.maxSize != null) {
           lengthwiseShift = Math.min(
             lengthwiseShift,
-            -(formerState.size - formerState.maxSize)
+            -(formerState.size - formerState.maxSize),
           );
         }
       }
@@ -186,13 +186,13 @@ export function ResizableStack({
         lengthwiseShift = Math.min(
           lengthwiseShift,
           latterState.size,
-          latterState.size - latterState.minSize
+          latterState.size - latterState.minSize,
         );
 
         if (latterState.maxSize != null) {
           lengthwiseShift = Math.max(
             lengthwiseShift,
-            latterState.size - latterState.maxSize
+            latterState.size - latterState.maxSize,
           );
         }
       }
@@ -204,7 +204,7 @@ export function ResizableStack({
         latterState.pendingSize = latterState.size - lengthwiseShift;
       }
     },
-    [stateMapRef]
+    [stateMapRef],
   );
 
   const mutateStateToFixSize = useCallback(
@@ -220,7 +220,7 @@ export function ResizableStack({
         nextState.size = nextState.pendingSize;
       }
     },
-    [stateMapRef]
+    [stateMapRef],
   );
 
   const mutateStateToSpreadExtraSize = useCallback(
@@ -239,7 +239,7 @@ export function ResizableStack({
 
         const totalItemSize = undeterminedStates.reduce(
           (sub, state) => sub + state.size,
-          0
+          0,
         );
 
         const freeSize = undeterminedFullSize - totalItemSize;
@@ -247,10 +247,10 @@ export function ResizableStack({
         const remainingUndeterminedStates = undeterminedStates.filter(
           (state, index) => {
             const lower = Math.floor(
-              (freeSize * index) / undeterminedStates.length
+              (freeSize * index) / undeterminedStates.length,
             );
             const upper = Math.floor(
-              (freeSize * (index + 1)) / undeterminedStates.length
+              (freeSize * (index + 1)) / undeterminedStates.length,
             );
 
             let isDetermined = false;
@@ -280,7 +280,7 @@ export function ResizableStack({
 
             const isUndetermined = !isDetermined;
             return isUndetermined;
-          }
+          },
         );
 
         if (remainingUndeterminedStates.length === undeterminedStates.length)
@@ -289,7 +289,7 @@ export function ResizableStack({
         undeterminedStates = remainingUndeterminedStates;
       }
     },
-    [stateMapRef, barSize]
+    [stateMapRef, barSize],
   );
 
   const handleResizing = useCallback(
@@ -304,7 +304,7 @@ export function ResizableStack({
       mutateStateToDetermineExtraSize,
       mutateStateToResizePendingSize,
       mutateStateToUpdateBarPosition,
-    ]
+    ],
   );
 
   const handleResized = useCallback(
@@ -321,7 +321,7 @@ export function ResizableStack({
       mutateStateToResizePendingSize,
       mutateStateToFixSize,
       mutateStateToUpdateBarPosition,
-    ]
+    ],
   );
 
   const mutateStateToReinitialize = useCallback(
@@ -356,7 +356,7 @@ export function ResizableStack({
           formerSiblingState = state;
 
           return [child.key, state];
-        })
+        }),
       );
     },
     [
@@ -365,7 +365,7 @@ export function ResizableStack({
       createInitialState,
       handleResizing,
       handleResized,
-    ]
+    ],
   );
 
   useEffect(() => {

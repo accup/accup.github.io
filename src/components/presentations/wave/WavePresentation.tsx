@@ -1,4 +1,4 @@
-import { ComponentProps, useCallback } from "react";
+import { type ComponentProps, useCallback } from "react";
 
 import {
   DynamicFrameset,
@@ -139,11 +139,11 @@ export function WavePresentation() {
           row,
           column,
           rowEnd,
-          columnEnd
+          columnEnd,
         );
       });
     },
-    [dynamicFramesetState, dynamicFramesetStateActions]
+    [dynamicFramesetState, dynamicFramesetStateActions],
   );
 
   return (

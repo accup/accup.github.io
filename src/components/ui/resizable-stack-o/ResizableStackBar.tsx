@@ -3,8 +3,8 @@ import type { WritingModes } from "../../../hooks/logical-property/useWritingMod
 import * as classes from "./ResizableStackBar.css";
 import classNames from "classnames";
 import {
-  DOMAttributes,
-  PointerEvent,
+  type DOMAttributes,
+  type PointerEvent,
   useCallback,
   useMemo,
   useRef,
@@ -78,7 +78,7 @@ export function ResizableStackBar({
           };
       }
     },
-    [direction, logicalConvert]
+    [direction, logicalConvert],
   );
 
   const resizeStartStateRef = useRef<{
@@ -109,10 +109,10 @@ export function ResizableStackBar({
           xEnd: e.clientX,
           yStart,
           yEnd: e.clientY,
-        })
+        }),
       );
     },
-    [resizeStartStateRef, onResizing, getResizeDetails]
+    [resizeStartStateRef, onResizing, getResizeDetails],
   );
 
   const handleResize = useCallback(
@@ -132,10 +132,10 @@ export function ResizableStackBar({
           xEnd: e.clientX,
           yStart,
           yEnd: e.clientY,
-        })
+        }),
       );
     },
-    [resizeStartStateRef, onResizing, getResizeDetails]
+    [resizeStartStateRef, onResizing, getResizeDetails],
   );
 
   const handleResizeEnd = useCallback(
@@ -156,10 +156,10 @@ export function ResizableStackBar({
           xEnd: e.clientX,
           yStart,
           yEnd: e.clientY,
-        })
+        }),
       );
     },
-    [resizeStartStateRef, onResized, getResizeDetails]
+    [resizeStartStateRef, onResized, getResizeDetails],
   );
 
   const style = useMemo(() => {

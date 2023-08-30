@@ -1,7 +1,7 @@
-import { RefObject, useCallback, useRef, useState } from "react";
+import { type RefObject, useCallback, useRef, useState } from "react";
 
 import {
-  AnimationLoopCallback,
+  type AnimationLoopCallback,
   useAnimationLoop,
 } from "../animation-frame/useAnimationLoop";
 
@@ -13,21 +13,21 @@ export type WritingModes = {
 export function useWritingModes(ref: RefObject<HTMLElement>): WritingModes {
   const targetRef = useRef(ref.current);
   const computedStyleRef = useRef(
-    getComputedStyle(ref.current ?? document.body)
+    getComputedStyle(ref.current ?? document.body),
   );
 
   const [writingMode, setWritingMode] = useState<string>(
-    computedStyleRef.current.writingMode
+    computedStyleRef.current.writingMode,
   );
   const [direction, setDirection] = useState<string>(
-    computedStyleRef.current.direction
+    computedStyleRef.current.direction,
   );
 
   const animationLoopCallback = useCallback<AnimationLoopCallback>(() => {
     if (targetRef.current !== ref.current) {
       targetRef.current = ref.current;
       computedStyleRef.current = getComputedStyle(
-        targetRef.current ?? document.body
+        targetRef.current ?? document.body,
       );
     }
 

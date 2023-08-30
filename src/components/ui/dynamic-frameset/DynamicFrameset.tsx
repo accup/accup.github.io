@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import {
   type CSSProperties,
-  ComponentType,
+  type ComponentType,
   type ReactNode,
   useMemo,
 } from "react";
@@ -16,7 +16,7 @@ import type {
 import { useDynamicFramesetGrid } from "./useDynamicFramesetGrid";
 
 type FrameComponentPropsWithoutState<
-  TProps extends DynamicFramesetFrameComponentProps
+  TProps extends DynamicFramesetFrameComponentProps,
 > = Omit<TProps, "state">;
 
 type FrameComponent<TProps extends DynamicFramesetFrameComponentProps> =
@@ -31,7 +31,7 @@ interface DynamicFramesetClasses {
 }
 
 export interface DynamicFramesetProps<
-  TProps extends DynamicFramesetFrameComponentProps
+  TProps extends DynamicFramesetFrameComponentProps,
 > {
   state: DynamicFramesetState<TProps>;
   classes?: DynamicFramesetClasses | undefined;
@@ -40,7 +40,7 @@ export interface DynamicFramesetProps<
 }
 
 export function DynamicFrameset<
-  TProps extends DynamicFramesetFrameComponentProps
+  TProps extends DynamicFramesetFrameComponentProps,
 >({
   state,
   classes,
@@ -78,7 +78,7 @@ export function DynamicFrameset<
 }
 
 interface DynamicFramesetFrameProps<
-  TProps extends DynamicFramesetFrameComponentProps
+  TProps extends DynamicFramesetFrameComponentProps,
 > {
   flow: DynamicFramesetFlow;
   frame: DynamicFramesetFrameState<TProps>;
@@ -89,7 +89,7 @@ interface DynamicFramesetFrameProps<
 }
 
 function DynamicFramesetFrame<
-  TProps extends DynamicFramesetFrameComponentProps
+  TProps extends DynamicFramesetFrameComponentProps,
 >({
   flow,
   frame,
@@ -128,7 +128,7 @@ function DynamicFramesetFrame<
 function getFramesetSizeStyles(
   flow: DynamicFramesetFlow,
   fullRowSize: number,
-  fullColumnSize: number
+  fullColumnSize: number,
 ): Pick<CSSProperties, "width" | "height" | "blockSize" | "inlineSize"> {
   switch (flow) {
     case "left/top":
@@ -172,7 +172,7 @@ function getFramesetSizeStyles(
 function getFrameRowStyles(
   flow: DynamicFramesetFlow,
   rowSize: number,
-  insetRowStart: number
+  insetRowStart: number,
 ): Pick<
   CSSProperties,
   | "top"
@@ -243,7 +243,7 @@ function getFrameRowStyles(
 function getFrameColumnStyles(
   flow: DynamicFramesetFlow,
   columnSize: number,
-  insetColumnStart: number
+  insetColumnStart: number,
 ): Pick<
   CSSProperties,
   | "top"
