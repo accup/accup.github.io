@@ -1,14 +1,19 @@
 import { useMemo } from "react";
 
 import type {
-  DynamicFramesetFrameComponentProps,
   DynamicFramesetGrid,
-  DynamicFramesetLineState,
+  DynamicFramesetTrackState,
   DynamicFramesetState,
 } from "./DynamicFrameset.types";
 
-function* lineSteps(
-  lines: readonly DynamicFramesetLineState[]
+/**
+ * Iterate the cumulation of each track size between two adjacent lines.
+ */
+function* trackSteps(
+  /**
+   * List of line definitions
+   */
+  lines: readonly DynamicFramesetTrackState[],
 ): Iterable<number> {
   let lastStep = 0;
 
@@ -21,37 +26,51 @@ function* lineSteps(
   }
 }
 
+/**
+ * Use the grid operations for a DynamicFrameset.
+ */
 export function useDynamicFramesetGrid<
-  TComponentProps extends DynamicFramesetFrameComponentProps
->(state: DynamicFramesetState<TComponentProps>): DynamicFramesetGrid {
+  FrameProps,
+  StaticProps extends Partial<FrameProps>,
+>(
+  /**
+   * DynamicFrameset state
+   */
+  state: DynamicFramesetState<FrameProps, StaticProps>,
+): DynamicFramesetGrid {
+  const { rowTracks: rows, columnTracks: columns } = state;
+
   return useMemo<DynamicFramesetGrid>(() => {
-    const rowSteps = [...lineSteps(state.rows)];
-    const columnSteps = [...lineSteps(state.columns)];
-    const maxRow = rowSteps.length - 1;
-    const maxColumn = columnSteps.length - 1;
+    const rowSteps = [...trackSteps(rows)];
+    const columnSteps = [...trackSteps(columns)];
+    const lastRow = rowSteps.length - 1;
+    const lastColumn = columnSteps.length - 1;
+
+    function clampRow(row: number) {
+      return Math.max(0, Math.min(row, lastRow));
+    }
+
+    function clampColumn(column: number) {
+      return Math.max(0, Math.min(column, lastColumn));
+    }
 
     return {
-      getFullSize: () => {
+      getTotalSizes() {
         return {
-          fullRowSize: rowSteps[maxRow] ?? 0,
-          fullColumnSize: columnSteps[maxColumn] ?? 0,
+          totalRowSize: rowSteps[lastRow] ?? 0,
+          totalColumnSize: columnSteps[lastColumn] ?? 0,
         };
       },
-      getAreaRect: ({
-        rowStart,
-        rowEnd,
-        columnStart,
-        columnEnd,
-      }: {
-        readonly rowStart: number;
-        readonly rowEnd: number;
-        readonly columnStart: number;
-        readonly columnEnd: number;
-      }) => {
-        rowStart = Math.max(0, Math.min(rowStart, maxRow));
-        rowEnd = Math.max(0, Math.min(rowEnd, maxRow));
-        columnStart = Math.max(0, Math.min(columnStart, maxColumn));
-        columnEnd = Math.max(0, Math.min(columnEnd, maxColumn));
+      getAreaRect(gridArea: {
+        readonly gridRowStart: number;
+        readonly gridRowEnd: number;
+        readonly gridColumnStart: number;
+        readonly gridColumnEnd: number;
+      }) {
+        const rowStart = clampRow(gridArea.gridRowStart);
+        const rowEnd = clampRow(gridArea.gridRowEnd);
+        const columnStart = clampColumn(gridArea.gridColumnStart);
+        const columnEnd = clampColumn(gridArea.gridColumnEnd);
 
         const insetRowStart = rowSteps[rowStart] ?? 0;
         const insetRowEnd = rowSteps[rowEnd] ?? 0;
@@ -68,5 +87,5 @@ export function useDynamicFramesetGrid<
         };
       },
     };
-  }, [state.rows, state.columns]);
+  }, [rows, columns]);
 }

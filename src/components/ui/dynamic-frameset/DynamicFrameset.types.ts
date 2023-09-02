@@ -1,7 +1,6 @@
-export interface DynamicFramesetFrameComponentProps<TState = unknown> {
-  readonly state: TState;
-}
-
+/**
+ * Frameset flow
+ */
 export type DynamicFramesetFlow =
   | "top/left"
   | "top/right"
@@ -20,97 +19,142 @@ export type DynamicFramesetFlow =
   | "inline-end/block-start"
   | "inline-end/block-end";
 
+type ComponentDynamicProps<
+  TComponentProps,
+  TComponentStaticProps extends Partial<TComponentProps>,
+> = {
+  [K in Exclude<
+    keyof TComponentProps,
+    keyof TComponentStaticProps
+  >]: TComponentProps[K];
+} & {
+  [K in keyof TComponentProps &
+    keyof TComponentStaticProps]?: TComponentProps[K];
+};
+
+/**
+ * State of the entire DynamicFrameset
+ */
 export interface DynamicFramesetState<
-  TComponentProps extends DynamicFramesetFrameComponentProps
+  TFrameComponentProps,
+  TFrameComponentStaticProps extends Partial<TFrameComponentProps>,
 > {
   /**
-   * flow
+   * Frameset flow
    */
   readonly flow: DynamicFramesetFlow;
   /**
-   * row lines
+   * Row tracks
    */
-  readonly rows: readonly DynamicFramesetLineState[];
+  readonly rowTracks: readonly DynamicFramesetTrackState[];
   /**
-   * column lines
+   * Column tracks
    */
-  readonly columns: readonly DynamicFramesetLineState[];
+  readonly columnTracks: readonly DynamicFramesetTrackState[];
   /**
-   * frames
+   * Frames
    */
-  readonly frames: readonly DynamicFramesetFrameState<TComponentProps>[];
+  readonly frames: readonly DynamicFramesetFrameState<
+    TFrameComponentProps,
+    TFrameComponentStaticProps
+  >[];
 }
 
-export interface DynamicFramesetLineState {
+/**
+ * Track state
+ */
+export interface DynamicFramesetTrackState {
   /**
-   * determined space
+   * Determined size
    */
   readonly basis: number;
   /**
-   * undetermined space
+   * Undetermined size
    */
   readonly flex: number;
 }
 
+/**
+ * Frame state
+ */
 export interface DynamicFramesetFrameState<
-  TComponentProps extends DynamicFramesetFrameComponentProps
+  TFrameComponentProps,
+  TFrameComponentStaticProps extends Partial<TFrameComponentProps>,
 > {
   /**
-   * frame identifier
+   * Frame identifier
    */
   readonly id: string;
   /**
-   * frame state
+   * Dynamic properties of the frame component
    */
-  readonly state: TComponentProps["state"];
+  readonly props: ComponentDynamicProps<
+    TFrameComponentProps,
+    TFrameComponentStaticProps
+  >;
   /**
-   * first row line number
+   * First row grid line
    */
   readonly gridRowStart: number;
   /**
-   * last row line number
+   * Last row grid line
    */
   readonly gridRowEnd: number;
   /**
-   * first column line number
+   * First column grid line
    */
   readonly gridColumnStart: number;
   /**
-   * last column line number
+   * Last column grid line
    */
   readonly gridColumnEnd: number;
   /**
-   * lower bound constraint of the row space
+   * Inclusive lower limit of the row-side frame size
    */
   readonly minRowSize?: number | undefined;
   /**
-   * upper bound constraint of the row space
+   * Inclusive upper limit of the row-side frame size
    */
   readonly maxRowSize?: number | undefined;
   /**
-   * lower bound constraint of the column space
+   * Inclusive lower limit of the column-side frame size
    */
   readonly minColumnSize?: number | undefined;
   /**
-   * upper bound constraint of the column space
+   * Inclusive upper limit of the column-side frame size
    */
   readonly maxColumnSize?: number | undefined;
 }
 
+/**
+ * Grid operations for DynamicFrameset
+ */
 export interface DynamicFramesetGrid {
-  getFullSize(this: void): {
-    fullRowSize: number;
-    fullColumnSize: number;
+  /**
+   * Get the properties related to the total size of the grid tracks.
+   */
+  getTotalSizes(this: void): {
+    /**
+     * Total size of all row tracks.
+     */
+    totalRowSize: number;
+    /**
+     * Total size of all column tracks.
+     */
+    totalColumnSize: number;
   };
 
+  /**
+   * Get the properties related to the size and position of a single grid track.
+   */
   getAreaRect(
     this: void,
     gridArea: {
-      readonly rowStart: number;
-      readonly rowEnd: number;
-      readonly columnStart: number;
-      readonly columnEnd: number;
-    }
+      readonly gridRowStart: number;
+      readonly gridRowEnd: number;
+      readonly gridColumnStart: number;
+      readonly gridColumnEnd: number;
+    },
   ): {
     rowSize: number;
     columnSize: number;

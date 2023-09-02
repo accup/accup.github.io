@@ -8,69 +8,70 @@ import {
 
 import type {
   DynamicFramesetFlow,
-  DynamicFramesetFrameComponentProps,
   DynamicFramesetFrameState,
   DynamicFramesetGrid,
   DynamicFramesetState,
 } from "./DynamicFrameset.types";
 import { useDynamicFramesetGrid } from "./useDynamicFramesetGrid";
 
-type FrameComponentPropsWithoutState<
-  TProps extends DynamicFramesetFrameComponentProps,
-> = Omit<TProps, "state">;
-
-type FrameComponent<TProps extends DynamicFramesetFrameComponentProps> =
-  ComponentType<
-    Pick<TProps, "state"> & FrameComponentPropsWithoutState<TProps>
-  >;
-
-interface DynamicFramesetClasses {
+export interface DynamicFramesetClasses {
   root?: string;
   frame?: string;
   thumb?: string;
 }
 
+/**
+ * DynamicFrameset properties
+ */
 export interface DynamicFramesetProps<
-  TProps extends DynamicFramesetFrameComponentProps,
+  TFrameComponentProps,
+  TFrameComponentStaticProps extends Partial<TFrameComponentProps>,
 > {
-  state: DynamicFramesetState<TProps>;
+  state: DynamicFramesetState<TFrameComponentProps, TFrameComponentStaticProps>;
   classes?: DynamicFramesetClasses | undefined;
-  FrameComponent: FrameComponent<TProps>;
-  FrameComponentProps: FrameComponentPropsWithoutState<TProps>;
+  FrameComponent: ComponentType<TFrameComponentProps>;
+  FrameComponentStaticProps: TFrameComponentStaticProps;
 }
 
+/**
+ * Render the same component with different properties in a grid layout.
+ */
 export function DynamicFrameset<
-  TProps extends DynamicFramesetFrameComponentProps,
+  TFrameComponentProps,
+  TFrameComponentStaticProps extends Partial<TFrameComponentProps>,
 >({
   state,
   classes,
   FrameComponent,
-  FrameComponentProps,
-}: DynamicFramesetProps<TProps>): ReactNode {
+  FrameComponentStaticProps,
+}: DynamicFramesetProps<
+  TFrameComponentProps,
+  TFrameComponentStaticProps
+>): ReactNode {
   const grid = useDynamicFramesetGrid(state);
 
   const rootStyle = useMemo<CSSProperties>(() => {
-    const { fullRowSize, fullColumnSize } = grid.getFullSize();
+    const { totalRowSize, totalColumnSize } = grid.getTotalSizes();
 
     return {
       display: "flow-root",
       isolation: "isolate",
       position: "relative",
-      ...getFramesetSizeStyles(state.flow, fullRowSize, fullColumnSize),
+      ...getFramesetSizeStyles(state.flow, totalRowSize, totalColumnSize),
     };
   }, [state.flow, grid]);
 
   return (
     <div className={classNames(classes?.root)} style={rootStyle}>
       {state.frames.map((frame) => (
-        <DynamicFramesetFrame
+        <DynamicFramesetFrame<TFrameComponentProps, TFrameComponentStaticProps>
           key={frame.id}
           flow={state.flow}
           frame={frame}
           grid={grid}
           classes={classes}
           FrameComponent={FrameComponent}
-          FrameComponentProps={FrameComponentProps}
+          FrameComponentStaticProps={FrameComponentStaticProps}
         />
       ))}
     </div>
@@ -78,33 +79,41 @@ export function DynamicFrameset<
 }
 
 interface DynamicFramesetFrameProps<
-  TProps extends DynamicFramesetFrameComponentProps,
+  TFrameComponentProps,
+  TFrameComponentStaticProps extends Partial<TFrameComponentProps>,
 > {
   flow: DynamicFramesetFlow;
-  frame: DynamicFramesetFrameState<TProps>;
+  frame: DynamicFramesetFrameState<
+    TFrameComponentProps,
+    TFrameComponentStaticProps
+  >;
   grid: DynamicFramesetGrid;
   classes?: DynamicFramesetClasses | undefined;
-  FrameComponent: FrameComponent<TProps>;
-  FrameComponentProps: FrameComponentPropsWithoutState<TProps>;
+  FrameComponent: ComponentType<TFrameComponentProps>;
+  FrameComponentStaticProps: TFrameComponentStaticProps;
 }
 
 function DynamicFramesetFrame<
-  TProps extends DynamicFramesetFrameComponentProps,
+  TFrameComponentProps,
+  TFrameComponentStaticProps extends Partial<TFrameComponentProps>,
 >({
   flow,
   frame,
   grid,
   classes,
   FrameComponent,
-  FrameComponentProps,
-}: DynamicFramesetFrameProps<TProps>) {
+  FrameComponentStaticProps,
+}: DynamicFramesetFrameProps<
+  TFrameComponentProps,
+  TFrameComponentStaticProps
+>) {
   const frameStyle = useMemo<CSSProperties>(() => {
     const { rowSize, columnSize, insetRowStart, insetColumnStart } =
       grid.getAreaRect({
-        rowStart: frame.gridRowStart,
-        rowEnd: frame.gridRowEnd,
-        columnStart: frame.gridColumnStart,
-        columnEnd: frame.gridColumnEnd,
+        gridRowStart: frame.gridRowStart,
+        gridRowEnd: frame.gridRowEnd,
+        gridColumnStart: frame.gridColumnStart,
+        gridColumnEnd: frame.gridColumnEnd,
       });
 
     return {
@@ -114,21 +123,27 @@ function DynamicFramesetFrame<
     };
   }, [flow, frame, grid]);
 
+  /**
+   * The merged object of the static and dynamic properties
+   * must satisfy TFrameComponentProps if partially
+   * undefined value does not exist in the static properties.
+   */
+  const props: TFrameComponentProps = {
+    ...FrameComponentStaticProps,
+    ...frame.props,
+  } as TFrameComponentProps;
+
   return (
     <div className={classNames(classes?.frame)} style={frameStyle}>
-      <FrameComponent
-        key={frame.id}
-        state={frame.state}
-        {...FrameComponentProps}
-      />
+      <FrameComponent key={frame.id} {...props} />
     </div>
   );
 }
 
 function getFramesetSizeStyles(
   flow: DynamicFramesetFlow,
-  fullRowSize: number,
-  fullColumnSize: number,
+  totalRowSize: number,
+  totalColumnSize: number,
 ): Pick<CSSProperties, "width" | "height" | "blockSize" | "inlineSize"> {
   switch (flow) {
     case "left/top":
@@ -136,8 +151,8 @@ function getFramesetSizeStyles(
     case "right/top":
     case "right/bottom":
       return {
-        width: fullRowSize,
-        height: fullColumnSize,
+        width: totalRowSize,
+        height: totalColumnSize,
       };
 
     case "top/left":
@@ -145,8 +160,8 @@ function getFramesetSizeStyles(
     case "bottom/left":
     case "bottom/right":
       return {
-        width: fullColumnSize,
-        height: fullRowSize,
+        width: totalColumnSize,
+        height: totalRowSize,
       };
 
     case "block-start/inline-start":
@@ -154,8 +169,8 @@ function getFramesetSizeStyles(
     case "block-end/inline-start":
     case "block-end/inline-end":
       return {
-        blockSize: fullRowSize,
-        inlineSize: fullColumnSize,
+        blockSize: totalRowSize,
+        inlineSize: totalColumnSize,
       };
 
     case "inline-start/block-start":
@@ -163,8 +178,8 @@ function getFramesetSizeStyles(
     case "inline-end/block-start":
     case "inline-end/block-end":
       return {
-        blockSize: fullColumnSize,
-        inlineSize: fullRowSize,
+        blockSize: totalColumnSize,
+        inlineSize: totalRowSize,
       };
   }
 }
