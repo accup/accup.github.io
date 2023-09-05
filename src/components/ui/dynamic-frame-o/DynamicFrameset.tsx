@@ -38,17 +38,17 @@ export type DynamicFramesetState = {
 export type DynamicFramesetOnFramesetStateRequested =
   () => DynamicFramesetState;
 export type DynamicFramesetOnFramesetStateChanged = (
-  state: DynamicFramesetState
+  state: DynamicFramesetState,
 ) => void;
 export type DynamicFramesetOnFrameRequested = (key: string) => () => ReactNode;
 
 function cloneEntryState(
-  entry: DynamicFrameEntryState
+  entry: DynamicFrameEntryState,
 ): DynamicFrameEntryState {
   switch (entry.type) {
     case "frame":
       return {
-        type: "frame",
+        type: "frame-container",
         frame: { ...entry.frame },
       };
 
@@ -64,7 +64,7 @@ function cloneEntryState(
 }
 
 function cloneStackState(
-  stack: DynamicFrameStackState
+  stack: DynamicFrameStackState,
 ): DynamicFrameStackState {
   return {
     direction: stack.direction,
@@ -79,7 +79,7 @@ type WalkOptions = {
 
 function walkEntryState(
   entry: DynamicFrameEntryState,
-  options: WalkOptions
+  options: WalkOptions,
 ): void {
   const { onFrameVisited } = options;
 
@@ -96,7 +96,7 @@ function walkEntryState(
 
 function walkStackState(
   stack: DynamicFrameStackState,
-  options: WalkOptions
+  options: WalkOptions,
 ): void {
   const { onStackVisited } = options;
 
@@ -121,7 +121,7 @@ export type DynamicFrameEntryMetrics = {
   maxColumnSize: number | null;
 };
 export type DynamicFrameMetricsChangedCallback = (
-  metrics: DynamicFrameEntryMetrics
+  metrics: DynamicFrameEntryMetrics,
 ) => void;
 
 type MakeAndMeasureResult<T> = {
@@ -145,7 +145,7 @@ function getStackNode({
 function makeAndMeasureEntryTree(
   entry: DynamicFrameEntryState,
   frameMap: DynamicFrameMap,
-  options: MakeTreeOptions
+  options: MakeTreeOptions,
 ): MakeAndMeasureResult<ResizableStackItem> {
   const {
     indices = [],
@@ -180,7 +180,7 @@ function makeAndMeasureEntryTree(
       const { metrics, item } = makeAndMeasureStackNode(
         entry.stack,
         frameMap,
-        options
+        options,
       );
       const { minRowSize, maxRowSize, minColumnSize, maxColumnSize } = metrics;
 
@@ -204,7 +204,7 @@ function makeAndMeasureEntryTree(
 function makeAndMeasureStackNode(
   stack: DynamicFrameStackState,
   frameMap: DynamicFrameMap,
-  options: MakeTreeOptions
+  options: MakeTreeOptions,
 ): MakeAndMeasureResult<() => ReactNode> {
   const { indices = [], barSize } = options;
 
@@ -227,7 +227,7 @@ function makeAndMeasureStackNode(
         minColumnSize: subMinColumnSize,
         maxColumnSize: subMaxColumnSize,
       },
-      { metrics: { minRowSize, maxRowSize, minColumnSize, maxColumnSize } }
+      { metrics: { minRowSize, maxRowSize, minColumnSize, maxColumnSize } },
     ) => {
       if (subMinRowSize == null) {
         subMinRowSize = minRowSize;
@@ -269,7 +269,7 @@ function makeAndMeasureStackNode(
       maxRowSize: null,
       minColumnSize: null,
       maxColumnSize: null,
-    }
+    },
   );
 
   const totalBarSize = barSize * children.length - 1;
@@ -377,7 +377,7 @@ export function DynamicFrameset({
       maxRowSize,
       minColumnSize,
       maxColumnSize,
-    ]
+    ],
   );
 
   return <StackNode />;

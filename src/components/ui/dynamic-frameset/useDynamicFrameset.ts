@@ -1,130 +1,57 @@
-import { useState, type ComponentType, useMemo } from "react";
-import type { DynamicFramesetProps } from "./DynamicFrameset";
-import type { DynamicFramesetState } from ".";
-import type {
-  DynamicFramesetFlow,
-  DynamicFramesetFrameState,
-} from "./DynamicFrameset.types";
+import {
+  useDynamicFramesetFrames,
+  type DynamicFramesetFramesProps,
+  type UseDynamicFramesetFramesProps,
+} from "./useDynamicFramesetFrames";
+import {
+  useDynamicFramesetGrid,
+  type DynamicFramesetGridProps,
+} from "./useDynamicFramesetGrid";
+import {
+  useDynamicFramesetOrigin,
+  type DynamicFramesetOriginProps,
+  type UseDynamicFramesetOriginProps,
+} from "./useDynamicFramesetOrigin";
+import {
+  useDynamicFramesetTracks,
+  type DynamicFramesetTracksProps,
+  type UseDynamicFramesetTracksProps,
+} from "./useDynamicFramesetTracks";
 
-export interface UseDynamicFramesetProps<
-  FrameProps,
-  StaticProps extends Partial<FrameProps>,
-  FramesetState = DynamicFramesetState<FrameProps, StaticProps>,
-> {
-  initializer?: ((this: void) => FramesetState) | undefined;
-  FrameComponent: ComponentType<FrameProps>;
-  FrameComponentStaticProps: StaticProps;
+export interface UseDynamicFramesetProps {
+  readonly origin: Pick<UseDynamicFramesetOriginProps, "initialize">;
+  readonly rowTracks: Pick<UseDynamicFramesetTracksProps, "initialize">;
+  readonly columnTracks: Pick<UseDynamicFramesetTracksProps, "initialize">;
+  readonly frames: Pick<UseDynamicFramesetFramesProps, "initialize">;
 }
 
-export interface DynamicFramesetActions<
-  FrameProps,
-  StaticProps extends Partial<FrameProps>,
-  FramesetState = DynamicFramesetState<FrameProps, StaticProps>,
-  DynamicProps = DynamicFramesetFrameState<FrameProps, StaticProps>["props"],
-> {
-  reset(this: void, state: FramesetState): void;
-
-  setFrameGrid(
-    this: void,
-    id: string,
-    gridRowStart: number,
-    gridColumnStart: number,
-    gridRowEnd: number,
-    gridColumnEnd: number,
-  ): void;
-
-  setFrameProps(this: void, id: string, props: DynamicProps): void;
-
-  changeFlow(this: void, flow: DynamicFramesetFlow): void;
+export interface DynamicFramesetProps {
+  readonly origin: DynamicFramesetOriginProps;
+  readonly rowTracks: DynamicFramesetTracksProps;
+  readonly columnTracks: DynamicFramesetTracksProps;
+  readonly grid: DynamicFramesetGridProps;
+  readonly frames: DynamicFramesetFramesProps;
 }
 
-export function useDynamicFrameset<
-  FrameProps,
-  StaticProps extends Partial<FrameProps>,
->(
-  props: UseDynamicFramesetProps<FrameProps, StaticProps>,
-): [
-  DynamicFramesetProps<FrameProps, StaticProps>,
-  DynamicFramesetActions<FrameProps, StaticProps>,
-] {
-  type FramesetState = DynamicFramesetState<FrameProps, StaticProps>;
-  type DynamicProps = DynamicFramesetFrameState<
-    FrameProps,
-    StaticProps
-  >["props"];
+export function useDynamicFrameset(props: UseDynamicFramesetProps) {
+  const origin = useDynamicFramesetOrigin(props.origin);
+  const rowTracks = useDynamicFramesetTracks(props.rowTracks);
+  const columnTracks = useDynamicFramesetTracks(props.columnTracks);
+  const grid = useDynamicFramesetGrid({
+    rowTracks,
+    columnTracks,
+  });
+  const frames = useDynamicFramesetFrames({
+    ...props.frames,
+    origin,
+    grid,
+  });
 
-  const { initializer, FrameComponent, FrameComponentStaticProps } = props;
-
-  const [state, setState] = useState<FramesetState>(
-    () =>
-      initializer?.() ?? {
-        flow: "block-start/inline-start",
-        rowTracks: [],
-        columnTracks: [],
-        frames: [],
-      },
-  );
-
-  const use = useMemo<DynamicFramesetActions<FrameProps, StaticProps>>(
-    () => ({
-      reset: (state: FramesetState) => {
-        setState(state);
-      },
-
-      setFrameGrid: (
-        id: string,
-        gridRowStart: number,
-        gridColumnStart: number,
-        gridRowEnd: number,
-        gridColumnEnd: number,
-      ) => {
-        setState((prevState) => ({
-          ...prevState,
-          frames: prevState.frames.map((frame) => {
-            if (frame.id === id) {
-              return {
-                ...frame,
-                gridRowStart,
-                gridRowEnd,
-                gridColumnStart,
-                gridColumnEnd,
-              };
-            } else {
-              return frame;
-            }
-          }),
-        }));
-      },
-
-      setFrameProps: (id: string, props: DynamicProps) => {
-        setState((prevState) => ({
-          ...prevState,
-          frames: prevState.frames.map((frame) => {
-            if (frame.id === id) {
-              return {
-                ...frame,
-                props,
-              };
-            } else {
-              return frame;
-            }
-          }),
-        }));
-      },
-
-      changeFlow: (flow: DynamicFramesetFlow) => {
-        setState((prevState) => ({ ...prevState, flow }));
-      },
-    }),
-    [setState],
-  );
-
-  return [
-    {
-      state,
-      FrameComponent,
-      FrameComponentStaticProps,
-    },
-    use,
-  ];
+  return {
+    origin,
+    rowTracks,
+    columnTracks,
+    grid,
+    frames,
+  };
 }

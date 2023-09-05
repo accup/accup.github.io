@@ -1,80 +1,87 @@
-import classNames from "classnames";
-import { type CSSProperties, type ComponentType, useMemo } from "react";
+import { useMemo, type CSSProperties, type ComponentType } from "react";
 
-import type {
-  DynamicFramesetFlow,
-  DynamicFramesetFrameState,
-  DynamicFramesetGrid,
-} from "./DynamicFrameset.types";
+import type { Classes, Styles } from "../../../utils/react/style";
+import type { DynamicFramesetOrigin } from "./DynamicFrameset.types";
+import type { DynamicFramesetGridProps } from "./useDynamicFramesetGrid";
+import type { DynamicFramesetFrame } from "./useDynamicFramesetFrames";
 
-export interface DynamicFramesetFrameClasses {
-  frame?: string | undefined;
-}
+export type DynamicFramesetFrameContainerStyleKey = "frameContainer";
 
-export interface DynamicFramesetFrameProps<
-  TFrameComponentProps,
-  TFrameComponentStaticProps extends Partial<TFrameComponentProps>,
-> {
-  flow: DynamicFramesetFlow;
-  frame: DynamicFramesetFrameState<
-    TFrameComponentProps,
-    TFrameComponentStaticProps
-  >;
-  grid: DynamicFramesetGrid;
-  classes?: DynamicFramesetFrameClasses | undefined;
-  FrameComponent: ComponentType<TFrameComponentProps>;
-  FrameComponentStaticProps: TFrameComponentStaticProps;
-}
-
-export function DynamicFramesetFrame<
-  TFrameComponentProps,
-  TFrameComponentStaticProps extends Partial<TFrameComponentProps>,
->({
-  flow,
-  frame,
-  grid,
-  classes,
-  FrameComponent,
-  FrameComponentStaticProps,
-}: DynamicFramesetFrameProps<
-  TFrameComponentProps,
-  TFrameComponentStaticProps
->) {
-  const frameStyle = useMemo<CSSProperties>(() => {
-    const { rowSize, columnSize, insetRowStart, insetColumnStart } =
-      grid.getAreaRect({
-        gridRowStart: frame.gridRowStart,
-        gridRowEnd: frame.gridRowEnd,
-        gridColumnStart: frame.gridColumnStart,
-        gridColumnEnd: frame.gridColumnEnd,
-      });
-
-    return {
-      position: "absolute",
-      ...getFrameRowStyles(flow, rowSize, insetRowStart),
-      ...getFrameColumnStyles(flow, columnSize, insetColumnStart),
-    };
-  }, [flow, frame, grid]);
-
+/**
+ * DynamicFrameset slots
+ */
+export interface DynamicFramesetFrameContainerSlots<TFrameProps> {
   /**
-   * The merged object of the static and dynamic properties
-   * must satisfy TFrameComponentProps if partially
-   * undefined value does not exist in the static properties.
+   * Frame content
    */
-  const props: TFrameComponentProps = {
-    ...FrameComponentStaticProps,
-    ...frame.props,
-  } as TFrameComponentProps;
+  readonly Frame?: ComponentType<TFrameProps> | undefined;
+}
+
+/**
+ * DynamicFrameset frame container properties
+ */
+export interface DynamicFramesetFrameContainerProps<TFrameProps> {
+  /**
+   * Frame properties
+   */
+  readonly frameProps?: TFrameProps | undefined;
+  /**
+   * DOM element classes
+   */
+  readonly classes?: Classes<DynamicFramesetFrameContainerStyleKey> | undefined;
+  /**
+   * DOM element styles
+   */
+  readonly styles?: Styles<DynamicFramesetFrameContainerStyleKey> | undefined;
+  /**
+   * Components
+   */
+  readonly slots?: DynamicFramesetFrameContainerSlots<TFrameProps> | undefined;
+}
+
+/**
+ * Render the frame container and the frame with specific properties.
+ */
+export function DynamicFramesetFrameContainer<TFrameProps>(
+  props: DynamicFramesetFrameContainerProps<TFrameProps>,
+) {
+  const { frameProps, classes, styles, slots: { Frame } = {} } = props;
 
   return (
-    <div className={classNames(classes?.frame)} style={frameStyle}>
-      <FrameComponent key={frame.id} {...props} />
+    <div className={classes?.frameContainer} style={styles?.frameContainer}>
+      {Frame != null && frameProps != null && (
+        <Frame key="frame" {...frameProps} />
+      )}
     </div>
   );
 }
 
+export function useDynamicFramesetFrameStyles(props: {
+  readonly origin: DynamicFramesetOrigin;
+  readonly grid: DynamicFramesetGridProps;
+  readonly frame: DynamicFramesetFrame;
+}): DynamicFramesetFrameContainerProps<unknown>["styles"] {
+  const { origin, grid, frame } = props;
+
+  const frameContainer = useMemo<CSSProperties>(() => {
+    const { rowSize, columnSize, insetRowStart, insetColumnStart } =
+      grid.getAreaRect(frame.gridArea);
+
+    return {
+      position: "absolute",
+      ...getFrameRowStyles(origin, rowSize, insetRowStart),
+      ...getFrameColumnStyles(origin, columnSize, insetColumnStart),
+    };
+  }, [origin, grid, frame]);
+
+  return { frameContainer };
+}
+
+/**
+ * Calculate row-side frame styles.
+ */
 function getFrameRowStyles(
-  flow: DynamicFramesetFlow,
+  origin: DynamicFramesetOrigin,
   rowSize: number,
   insetRowStart: number,
 ): Pick<
@@ -92,7 +99,7 @@ function getFrameRowStyles(
   | "blockSize"
   | "inlineSize"
 > {
-  switch (flow) {
+  switch (origin) {
     case "left/top":
     case "left/bottom":
       return {
@@ -144,8 +151,11 @@ function getFrameRowStyles(
   }
 }
 
+/**
+ * Calculate column-side frame styles.
+ */
 function getFrameColumnStyles(
-  flow: DynamicFramesetFlow,
+  origin: DynamicFramesetOrigin,
   columnSize: number,
   insetColumnStart: number,
 ): Pick<
@@ -163,7 +173,7 @@ function getFrameColumnStyles(
   | "blockSize"
   | "inlineSize"
 > {
-  switch (flow) {
+  switch (origin) {
     case "top/left":
     case "bottom/left":
       return {

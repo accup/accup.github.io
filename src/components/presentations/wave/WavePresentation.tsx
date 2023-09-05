@@ -29,38 +29,39 @@ function SomeComponent(props: SomeComponentProps) {
 }
 
 export function WavePresentation() {
-  const [props, { setFrameGrid }] = useDynamicFrameset({
-    initializer: () => ({
-      flow: "block-start/inline-start",
-      rowTracks: Array.from({ length: 9 }, () => ({ basis: 100, flex: 0 })),
-      columnTracks: Array.from({ length: 9 }, () => ({
-        basis: 100,
-        flex: 0,
-      })),
-      frames: Array.from({ length: 14 }, (_, index) => ({
-        id: index.toString(),
-        props: {
-          label: index.toString() + 4,
-          onClick: () => {
-            const row = Math.floor(Math.random() * 9);
-            const column = Math.floor(Math.random() * 9);
-            // HACK: illegal but available callback in React
-            setFrameGrid(index.toString(), row, column, row + 1, column + 1);
+  const frameset = useDynamicFrameset({
+    origin: {
+      initialize: () => "block-start/inline-start",
+    },
+    rowTracks: {
+      initialize: () =>
+        Array.from({ length: 9 }, () => ({ basis: 100, flex: 0 })),
+    },
+    columnTracks: {
+      initialize: () =>
+        Array.from({ length: 9 }, () => ({
+          basis: 100,
+          flex: 0,
+        })),
+    },
+    frames: {
+      initialize: () =>
+        Array.from({ length: 14 }, (_, index) => ({
+          id: index.toString(),
+          gridArea: {
+            gridRowStart: index % 8,
+            gridRowEnd: (index % 8) + 1,
+            gridColumnStart: Math.floor(index / 8),
+            gridColumnEnd: Math.floor(index / 8) + 1,
           },
-        },
-        gridRowStart: index % 8,
-        gridRowEnd: (index % 8) + 1,
-        gridColumnStart: Math.floor(index / 8),
-        gridColumnEnd: Math.floor(index / 8) + 1,
-      })),
-    }),
-    FrameComponent: SomeComponent,
-    FrameComponentStaticProps: {},
+          constraints: {},
+        })),
+    },
   });
 
   return (
     <div className={classes.root}>
-      <DynamicFrameset {...props} classes={{ frame: classes.frame }} />
+      <DynamicFrameset {...frameset} classes={{ frame: classes.frame }} />
     </div>
   );
 }
