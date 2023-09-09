@@ -1,2 +1,2 @@
 export { DynamicFrameset } from "./DynamicFrameset";
-export { useDynamicFrameset } from "./useDynamicFrameset";
+export { useDynamicFramesetKit } from "./useDynamicFramesetKit";

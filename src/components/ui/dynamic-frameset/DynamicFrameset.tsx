@@ -7,32 +7,33 @@ import {
 
 import type {
   DynamicFramesetFramePropertyMap,
-  DynamicFramesetFrameState,
-  DynamicFramesetGrid,
   DynamicFramesetOrigin,
 } from "./DynamicFrameset.types";
 import {
   DynamicFramesetFrameContainer,
+  type DynamicFramesetFrameContainerClasses,
   type DynamicFramesetFrameContainerProps,
-  type DynamicFramesetFrameContainerStyleKey,
+  type DynamicFramesetFrameContainerSlots,
 } from "./DynamicFramesetFrameContainer";
-import type { Classes, Styles } from "../../../utils/react/style";
-import { useDynamicFramesetFrame } from "./useDynamicFramesetFrames";
-import type { DynamicFramesetGridProps } from "./useDynamicFramesetGrid";
+import type { DynamicFramesetKit } from "./useDynamicFramesetKit";
 
-export type DynamicFramesetStyleKey =
-  | "frameset"
-  | "thumb"
-  | DynamicFramesetFrameContainerStyleKey;
+export interface DynamicFramesetProps<TFrameProps> {
+  readonly frameset: DynamicFramesetKit;
+  readonly framePropsMap?:
+    | DynamicFramesetFramePropertyMap<TFrameProps>
+    | undefined;
+  readonly classes?: DynamicFramesetClasses | undefined;
+  readonly slots?: DynamicFramesetSlots<TFrameProps> | undefined;
+}
 
-/**
- * DynamicFrameset slots
- */
-export interface DynamicFramesetSlots<TFrameProps> {
-  /**
-   * Frame content
-   */
-  readonly Frame?: ComponentType<TFrameProps> | undefined;
+export interface DynamicFramesetClasses
+  extends DynamicFramesetFrameContainerClasses {
+  readonly root?: string | undefined;
+  readonly thumb?: string | undefined;
+}
+
+export interface DynamicFramesetSlots<TFrameProps>
+  extends DynamicFramesetFrameContainerSlots<TFrameProps> {
   /**
    * Frame container
    */
@@ -42,130 +43,47 @@ export interface DynamicFramesetSlots<TFrameProps> {
 }
 
 /**
- * DynamicFrameset properties
- */
-export interface DynamicFramesetProps<TFrameProps> {
-  /**
-   * Starting point of the DynamicFrameset flow
-   */
-  readonly origin: DynamicFramesetOrigin;
-  /**
-   * Grid operations
-   */
-  readonly grid: DynamicFramesetGrid;
-  /**
-   * List of frame states
-   */
-  readonly frameStates?: readonly DynamicFramesetFrameState[] | undefined;
-  /**
-   * Mapping of frame properties
-   */
-  readonly framePropsMap?:
-    | DynamicFramesetFramePropertyMap<TFrameProps>
-    | undefined;
-  /**
-   * DOM element classes
-   */
-  readonly classes?: Classes<DynamicFramesetStyleKey> | undefined;
-  /**
-   * DOM element styles
-   */
-  readonly styles?: Styles<DynamicFramesetStyleKey> | undefined;
-  /**
-   * Components
-   */
-  readonly slots?: DynamicFramesetSlots<TFrameProps> | undefined;
-}
-
-/**
  * Render the same component with different properties in a grid layout.
  */
 export function DynamicFrameset<TFrameProps>(
   props: DynamicFramesetProps<TFrameProps>,
 ): ReactNode {
-  const {
-    origin,
-    grid,
-    frameStates = [],
-    framePropsMap,
-    classes,
-    styles,
-    slots,
-  } = props;
+  const { frameset, framePropsMap, classes, slots } = props;
+  const { origin, grid, frames: framesKit } = frameset;
+  const { FrameContainer = DynamicFramesetFrameContainer } = slots ?? {};
+
+  const frames = useMemo(
+    () => framesKit.getFrames(framePropsMap),
+    [framesKit, framePropsMap],
+  );
+
+  const rootStyle = useMemo<CSSProperties>(() => {
+    return {
+      display: "flow-root",
+      isolation: "isolate",
+      position: "relative",
+      ...getFramesetSizeStyles(
+        origin.state,
+        grid.totalRowSize,
+        grid.totalColumnSize,
+      ),
+    };
+  }, [origin, grid]);
 
   return (
-    <div className={classes?.frameset} style={styles?.frameset}>
-      {frameStates.map((frameState) => (
-        <StandaloneFrameContainer
-          key={frameState.id}
-          origin={origin}
-          grid={grid}
-          frameState={frameState}
-          frameProps={framePropsMap?.get?.(frameState.id)}
+    <div className={classes?.root} style={rootStyle}>
+      {frames.map((frame) => (
+        <FrameContainer
+          key={frame.state.id}
+          origin={frameset.origin}
+          grid={frameset.grid}
+          frame={frame}
           classes={classes}
-          styles={styles}
           slots={slots}
         />
       ))}
     </div>
   );
-}
-
-function StandaloneFrameContainer<TFrameProps>(
-  props: {
-    readonly origin: DynamicFramesetOrigin;
-    readonly grid: DynamicFramesetGrid;
-    readonly frameState: DynamicFramesetFrameState;
-    readonly slots?: DynamicFramesetSlots<TFrameProps> | undefined;
-  } & Pick<
-    DynamicFramesetFrameContainerProps<TFrameProps>,
-    "frameProps" | "classes" | "styles"
-  >,
-) {
-  const {
-    origin,
-    grid,
-    frameState,
-    frameProps,
-    slots: { Frame, FrameContainer = DynamicFramesetFrameContainer } = {},
-  } = props;
-
-  const frameContainerProps = useDynamicFramesetFrame({
-    origin,
-    grid,
-    frameState,
-  });
-
-  return (
-    <FrameContainer
-      {...frameContainerProps}
-      frameProps={frameProps}
-      slots={{ Frame }}
-    />
-  );
-}
-
-export function useDynamicFrameset<TFrameComponentProps>(props: {
-  readonly origin: DynamicFramesetOrigin;
-  readonly grid: DynamicFramesetGridProps;
-  readonly FrameComponent: ComponentType<TFrameComponentProps>;
-}): DynamicFramesetProps<TFrameComponentProps> {
-  const { origin, grid } = props;
-
-  return {
-    styles: {
-      frameset: useMemo<CSSProperties>(() => {
-        const { totalRowSize, totalColumnSize } = grid.getTotalSizes();
-
-        return {
-          display: "flow-root",
-          isolation: "isolate",
-          position: "relative",
-          ...getFramesetSizeStyles(origin, totalRowSize, totalColumnSize),
-        };
-      }, [origin, grid]),
-    },
-  };
 }
 
 function getFramesetSizeStyles(

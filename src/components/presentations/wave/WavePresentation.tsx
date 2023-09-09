@@ -1,4 +1,8 @@
-import { DynamicFrameset, useDynamicFrameset } from "../../ui/dynamic-frameset";
+import { useMemo } from "react";
+import {
+  DynamicFrameset,
+  useDynamicFramesetKit,
+} from "../../ui/dynamic-frameset";
 
 import * as classes from "./WavePresentation.css";
 
@@ -14,7 +18,8 @@ function SomeComponent(props: SomeComponentProps) {
     <button
       type="button"
       style={{
-        fontSize: 16,
+        padding: 0,
+        fontSize: 1,
         color: "inherit",
         display: "block",
         background: "none",
@@ -29,39 +34,64 @@ function SomeComponent(props: SomeComponentProps) {
 }
 
 export function WavePresentation() {
-  const frameset = useDynamicFrameset({
-    origin: {
-      initialize: () => "block-start/inline-start",
-    },
-    rowTracks: {
-      initialize: () =>
-        Array.from({ length: 9 }, () => ({ basis: 100, flex: 0 })),
-    },
-    columnTracks: {
-      initialize: () =>
-        Array.from({ length: 9 }, () => ({
-          basis: 100,
-          flex: 0,
-        })),
-    },
-    frames: {
-      initialize: () =>
-        Array.from({ length: 14 }, (_, index) => ({
-          id: index.toString(),
-          gridArea: {
-            gridRowStart: index % 8,
-            gridRowEnd: (index % 8) + 1,
-            gridColumnStart: Math.floor(index / 8),
-            gridColumnEnd: Math.floor(index / 8) + 1,
-          },
-          constraints: {},
-        })),
-    },
+  const frameset = useDynamicFramesetKit({
+    initialize: () => ({
+      rowTracks: Array.from({ length: 100 }, () => ({ basis: 24, flex: 0 })),
+      columnTracks: Array.from({ length: 100 }, () => ({ basis: 24, flex: 0 })),
+      frames: Array.from({ length: 1600 }, (_, index) => ({
+        id: index.toString(10),
+        gridArea: {
+          gridRowStart: index % 40,
+          gridRowEnd: (index % 40) + 1,
+          gridColumnStart: Math.floor(index / 40),
+          gridColumnEnd: Math.floor(index / 40) + 1,
+        },
+        constraints: {},
+      })),
+    }),
   });
+
+  const {
+    frames: { replaceFrames },
+    rowTracks: { setState: setRowTracks },
+    columnTracks: { setState: setColumnTracks },
+  } = frameset;
+
+  const framePropsMap = useMemo(() => {
+    return new Map(
+      Array.from({ length: 1600 }, (_, index) => [
+        index.toString(10),
+        {
+          label: index.toString(10),
+          onClick: () => {
+            replaceFrames(
+              Array.from({ length: 1600 }, () =>
+                Math.floor(Math.random() * 1600),
+              ).map((loc, index) => ({
+                id: index.toString(10),
+                gridArea: {
+                  gridRowStart: loc % 40,
+                  gridRowEnd: (loc % 40) + 1,
+                  gridColumnStart: Math.floor(loc / 40),
+                  gridColumnEnd: Math.floor(loc / 40) + 1,
+                },
+                constraints: {},
+              })),
+            );
+          },
+        } satisfies SomeComponentProps,
+      ]),
+    );
+  }, [replaceFrames]);
 
   return (
     <div className={classes.root}>
-      <DynamicFrameset {...frameset} classes={{ frame: classes.frame }} />
+      <DynamicFrameset
+        frameset={frameset}
+        framePropsMap={framePropsMap}
+        classes={{ frameContainer: classes.frameContainer }}
+        slots={{ Frame: SomeComponent }}
+      />
     </div>
   );
 }

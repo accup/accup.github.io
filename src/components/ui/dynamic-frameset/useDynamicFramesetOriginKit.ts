@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { InitializeState } from "../../../utils/react/state";
 import type { DynamicFramesetOrigin } from "./DynamicFrameset.types";
 
 export interface UseDynamicFramesetOriginProps {
@@ -7,35 +8,32 @@ export interface UseDynamicFramesetOriginProps {
    *
    * @default "block-start/inline-start"
    */
-  readonly initialize?:
-    | DynamicFramesetOrigin
-    | (() => DynamicFramesetOrigin)
-    | undefined;
+  readonly initialize?: InitializeState<DynamicFramesetOrigin> | undefined;
 }
 
 /**
  * Origin properties for DynamicFrameset
  */
-export interface DynamicFramesetOriginProps {
+export interface DynamicFramesetOriginKit {
   /**
-   * Origin
+   * Origin state
    */
-  origin: DynamicFramesetOrigin;
+  readonly state: DynamicFramesetOrigin;
   /**
    * Change origin.
    */
-  setOrigin(origin: DynamicFramesetOrigin): void;
+  setState(state: DynamicFramesetOrigin): void;
 }
 
-export function useDynamicFramesetOrigin(
+export function useDynamicFramesetOriginKit(
   props?: UseDynamicFramesetOriginProps | undefined,
-): DynamicFramesetOriginProps {
+): DynamicFramesetOriginKit {
   const { initialize = "block-start/inline-start" } = props ?? {};
 
-  const [origin, setOrigin] = useState<DynamicFramesetOrigin>(initialize);
+  const [state, setState] = useState<DynamicFramesetOrigin>(initialize);
 
   return {
-    origin,
-    setOrigin,
+    state,
+    setState,
   };
 }

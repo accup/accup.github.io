@@ -1,9 +1,9 @@
 import { useCallback, useMemo } from "react";
 
 import type {
-  DynamicFramesetTrack,
-  DynamicFramesetTracksProps,
-} from "./useDynamicFramesetTracks";
+  DynamicFramesetTrackState,
+  DynamicFramesetTracksKit,
+} from "./useDynamicFramesetTracksKit";
 
 /**
  * Position and size of a frame
@@ -49,28 +49,20 @@ export interface DynamicFramesetGridAreaConstraints {
   readonly maxColumnSize?: number | undefined;
 }
 
-export interface UseDynamicFramesetGridProps {
-  readonly rowTracks: DynamicFramesetTracksProps;
-  readonly columnTracks: DynamicFramesetTracksProps;
+export interface UseDynamicFramesetGridKitProps {
+  readonly rowTracks: DynamicFramesetTracksKit;
+  readonly columnTracks: DynamicFramesetTracksKit;
 }
 
-/**
- * Grid properties for DynamicFrameset
- */
-export interface DynamicFramesetGridProps {
+export interface DynamicFramesetGridKit {
   /**
-   * Get the properties related to the total size of the grid tracks.
+   * Total size of all row tracks.
    */
-  getTotalSizes(this: void): {
-    /**
-     * Total size of all row tracks.
-     */
-    readonly totalRowSize: number;
-    /**
-     * Total size of all column tracks.
-     */
-    readonly totalColumnSize: number;
-  };
+  readonly totalRowSize: number;
+  /**
+   * Total size of all column tracks.
+   */
+  readonly totalColumnSize: number;
 
   /**
    * Get the properties related to the size and position of a single grid track.
@@ -92,17 +84,23 @@ export interface DynamicFramesetGridProps {
  * Use the grid operations for a DynamicFrameset.
  */
 export function useDynamicFramesetGrid(
-  props: UseDynamicFramesetGridProps,
-): DynamicFramesetGridProps {
+  props: UseDynamicFramesetGridKitProps,
+): DynamicFramesetGridKit {
   const { rowTracks, columnTracks } = props;
 
-  const rowSteps = useMemo(() => [...steps(rowTracks.tracks)], [rowTracks]);
-  const columnSteps = useMemo(
-    () => [...steps(columnTracks.tracks)],
-    [columnTracks],
-  );
+  const rowSteps = useMemo(() => steps(rowTracks.state), [rowTracks]);
+  const columnSteps = useMemo(() => steps(columnTracks.state), [columnTracks]);
   const lastRowLine = useMemo(() => rowSteps.length - 1, [rowSteps]);
   const lastColumnLine = useMemo(() => columnSteps.length - 1, [columnSteps]);
+
+  const totalRowSize = useMemo(
+    () => rowSteps[lastRowLine] ?? 0,
+    [rowSteps, lastRowLine],
+  );
+  const totalColumnSize = useMemo(
+    () => columnSteps[lastColumnLine] ?? 0,
+    [columnSteps, lastColumnLine],
+  );
 
   const clampRowLine = useCallback(
     (rowTrack: number) => {
@@ -116,13 +114,6 @@ export function useDynamicFramesetGrid(
     },
     [lastColumnLine],
   );
-
-  const getTotalSizes = useCallback(() => {
-    return {
-      totalRowSize: rowSteps[lastRowLine] ?? 0,
-      totalColumnSize: columnSteps[lastColumnLine] ?? 0,
-    };
-  }, [rowSteps, columnSteps, lastRowLine, lastColumnLine]);
 
   const getAreaRect = useCallback(
     (gridArea: DynamicFramesetGridArea) => {
@@ -149,27 +140,29 @@ export function useDynamicFramesetGrid(
   );
 
   return {
-    getTotalSizes,
+    totalRowSize,
+    totalColumnSize,
     getAreaRect,
   };
 }
 
 /**
- * Iterate the cumulation of each track size between two adjacent lines.
+ * Get cumulation of each track size between two adjacent lines.
  */
-function* steps(
+function steps(
   /**
    * List of line definitions
    */
-  lines: readonly DynamicFramesetTrack[],
-): Iterable<number> {
+  lines: readonly DynamicFramesetTrackState[],
+): readonly number[] {
   let lastStep = 0;
-
-  yield lastStep;
+  const steps = [lastStep];
 
   for (const { basis, flex } of lines) {
     const size = basis + flex;
     lastStep += size;
-    yield lastStep;
+    steps.push(lastStep);
   }
+
+  return steps;
 }

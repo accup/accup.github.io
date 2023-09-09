@@ -28,8 +28,9 @@ export const root = style([
   },
 ]);
 
-export const frame = style([
+export const frameContainer = style([
   {
+    border: `1px inset ${theme.color.bgSecondary}`,
     transition: "0.3s ease-in-out",
     transitionProperty: "inset, width, height, block-size, inline-size",
   },
