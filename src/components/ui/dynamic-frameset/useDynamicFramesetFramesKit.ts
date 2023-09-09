@@ -1,10 +1,8 @@
 import { useCallback } from "react";
 import { type InitializeState } from "../../../utils/react/state";
-import { useArrayStateKit } from "../../../utils/react/useArrayStateKit";
-import type {
-  DynamicFramesetFrameId,
-  DynamicFramesetFramePropertyMap,
-} from "./DynamicFrameset.types";
+import { useConvertMap } from "../../../utils/react/useConvertMap";
+import { useMapStateKit } from "../../../utils/react/useMapStateKit";
+import type { DynamicFramesetFrameKey } from "./DynamicFrameset.types";
 import type {
   DynamicFramesetGridArea,
   DynamicFramesetGridAreaConstraints,
@@ -15,10 +13,6 @@ import type {
  */
 export interface DynamicFramesetFrameState {
   /**
-   * Frame identifier
-   */
-  readonly id: DynamicFramesetFrameId;
-  /**
    * Position and size of the frame
    */
   readonly gridArea: DynamicFramesetGridArea;
@@ -28,60 +22,84 @@ export interface DynamicFramesetFrameState {
   readonly constraints: DynamicFramesetGridAreaConstraints;
 }
 
-export interface DynamicFramesetFrameKit<TFrameProps> {
-  readonly state: DynamicFramesetFrameState;
+export interface DynamicFramesetFrameKit<
+  K extends DynamicFramesetFrameKey,
+  TFrameProps,
+> {
+  readonly key: K;
+  readonly frame: DynamicFramesetFrameState;
   readonly frameProps: TFrameProps | undefined;
-  setState(state: DynamicFramesetFrameState): void;
+  replaceFrame(frame: DynamicFramesetFrameState): void;
 }
 
-export interface UseDynamicFramesetFramesProps {
+export interface UseDynamicFramesetFramesProps<
+  K extends DynamicFramesetFrameKey,
+> {
   initialize?:
-    | InitializeState<readonly DynamicFramesetFrameState[]>
+    | InitializeState<ReadonlyMap<K, DynamicFramesetFrameState>>
     | undefined;
 }
 
-export interface DynamicFramesetFramesKit {
-  getFrames<TFrameProps>(
-    framePropsMap?: DynamicFramesetFramePropertyMap<TFrameProps> | undefined,
-  ): readonly DynamicFramesetFrameKit<TFrameProps>[];
-  replaceFrames(frameStates: readonly DynamicFramesetFrameState[]): void;
-  insertFrame(index: number, frameState: DynamicFramesetFrameState): void;
-  updateFrame(index: number, frameState: DynamicFramesetFrameState): void;
-  removeFrame(index: number, frameState: DynamicFramesetFrameState): void;
+export interface DynamicFramesetFramesKit<K extends DynamicFramesetFrameKey> {
+  /**
+   * Mapping of frame states
+   */
+  readonly frameMap: ReadonlyMap<K, DynamicFramesetFrameState>;
+  replaceFrameMap(frameMap: ReadonlyMap<K, DynamicFramesetFrameState>): void;
+  setFrame(key: K, frame: DynamicFramesetFrameState): void;
+  removeFrame(key: K): void;
+  useFrameKits<TFrameProps>(
+    framePropsMap: ReadonlyMap<K, TFrameProps>,
+  ): readonly DynamicFramesetFrameKit<K, TFrameProps>[];
 }
 
-export function useDynamicFramesetFramesKit(
-  props: UseDynamicFramesetFramesProps,
-): DynamicFramesetFramesKit {
-  const { initialize = [] } = props;
+export function useDynamicFramesetFramesKit<K extends DynamicFramesetFrameKey>(
+  props: UseDynamicFramesetFramesProps<K>,
+): DynamicFramesetFramesKit<K> {
+  const { initialize } = props;
 
   const {
-    state,
-    setState: replaceFrames,
-    insertItem: insertFrame,
-    updateItem: updateFrame,
+    map: frameMap,
+    replaceMap: replaceFrameMap,
+    setItem: setFrame,
     removeItem: removeFrame,
-  } = useArrayStateKit({ initialize });
+  } = useMapStateKit<K, DynamicFramesetFrameState>({ initialize });
 
-  const getFrames = useCallback<DynamicFramesetFramesKit["getFrames"]>(
-    (framePropsMap) =>
-      state.map((state, index) => {
-        const frameProps = framePropsMap?.get?.(state.id);
+  const useFrameKits = useCallback(
+    function useFrameKits<TFrameProps>(
+      framePropsMap: ReadonlyMap<K, TFrameProps>,
+    ): readonly DynamicFramesetFrameKit<K, TFrameProps>[] {
+      const convert = useCallback(
+        (key: K, frame: DynamicFramesetFrameState) => ({
+          key,
+          frame,
+          frameProps: framePropsMap.get(key),
+          replaceFrame: (frame: DynamicFramesetFrameState) => {
+            setFrame(key, frame);
+          },
+        }),
+        [framePropsMap],
+      );
 
-        return {
-          state,
-          frameProps,
-          setState: (state) => updateFrame(index, state),
-        };
-      }),
-    [state, updateFrame],
+      const frameKitMap = useConvertMap<
+        K,
+        DynamicFramesetFrameState,
+        DynamicFramesetFrameKit<K, TFrameProps>
+      >({
+        map: frameMap,
+        convert,
+      });
+
+      return [...frameKitMap.values()];
+    },
+    [frameMap, setFrame],
   );
 
   return {
-    getFrames,
-    replaceFrames,
-    insertFrame,
-    updateFrame,
+    frameMap,
+    replaceFrameMap,
+    setFrame,
     removeFrame,
+    useFrameKits,
   };
 }

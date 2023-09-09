@@ -19,7 +19,7 @@ function SomeComponent(props: SomeComponentProps) {
       type="button"
       style={{
         padding: 0,
-        fontSize: 1,
+        fontSize: 10,
         color: "inherit",
         display: "block",
         background: "none",
@@ -34,60 +34,74 @@ function SomeComponent(props: SomeComponentProps) {
 }
 
 export function WavePresentation() {
-  const frameset = useDynamicFramesetKit({
+  const framesetKit = useDynamicFramesetKit({
     initialize: () => ({
-      rowTracks: Array.from({ length: 100 }, () => ({ basis: 24, flex: 0 })),
-      columnTracks: Array.from({ length: 100 }, () => ({ basis: 24, flex: 0 })),
-      frames: Array.from({ length: 1600 }, (_, index) => ({
-        id: index.toString(10),
-        gridArea: {
-          gridRowStart: index % 40,
-          gridRowEnd: (index % 40) + 1,
-          gridColumnStart: Math.floor(index / 40),
-          gridColumnEnd: Math.floor(index / 40) + 1,
-        },
-        constraints: {},
+      rowSideTracks: Array.from({ length: 50 }, () => ({
+        basis: 18,
+        flex: 0,
       })),
+      columnSideTracks: Array.from({ length: 120 }, () => ({
+        basis: 18,
+        flex: 0,
+      })),
+      frames: new Map(
+        Array.from({ length: 500 }, (_, index) => [
+          index.toString(10),
+          {
+            gridArea: {
+              gridRowStart: index % 50,
+              gridRowEnd: (index % 50) + 1,
+              gridColumnStart: Math.floor(index / 50),
+              gridColumnEnd: Math.floor(index / 50) + 1,
+            },
+            constraints: {},
+          },
+        ]),
+      ),
     }),
   });
 
-  const {
-    frames: { replaceFrames },
-    rowTracks: { setState: setRowTracks },
-    columnTracks: { setState: setColumnTracks },
-  } = frameset;
+  const { replaceFrameMap } = framesetKit;
 
   const framePropsMap = useMemo(() => {
     return new Map(
-      Array.from({ length: 1600 }, (_, index) => [
+      Array.from({ length: 800 }, (_, index) => [
         index.toString(10),
         {
           label: index.toString(10),
           onClick: () => {
-            replaceFrames(
-              Array.from({ length: 1600 }, () =>
-                Math.floor(Math.random() * 1600),
-              ).map((loc, index) => ({
-                id: index.toString(10),
-                gridArea: {
-                  gridRowStart: loc % 40,
-                  gridRowEnd: (loc % 40) + 1,
-                  gridColumnStart: Math.floor(loc / 40),
-                  gridColumnEnd: Math.floor(loc / 40) + 1,
-                },
-                constraints: {},
-              })),
+            replaceFrameMap(
+              new Map(
+                Array.from({ length: Math.random() * 800 }, () =>
+                  Math.floor(Math.random() * 5200),
+                ).map((loc, index) => [
+                  index.toString(10),
+                  {
+                    gridArea: {
+                      gridRowStart: loc % 50,
+                      gridColumnStart: Math.floor(loc / 50),
+                      gridRowEnd:
+                        (loc % 50) + Math.floor(Math.random() * 3) + 1,
+                      gridColumnEnd:
+                        Math.floor(loc / 50) +
+                        Math.floor(Math.random() * 3) +
+                        1,
+                    },
+                    constraints: {},
+                  },
+                ]),
+              ),
             );
           },
         } satisfies SomeComponentProps,
       ]),
     );
-  }, [replaceFrames]);
+  }, [replaceFrameMap]);
 
   return (
     <div className={classes.root}>
       <DynamicFrameset
-        frameset={frameset}
+        framesetKit={framesetKit}
         framePropsMap={framePropsMap}
         classes={{ frameContainer: classes.frameContainer }}
         slots={{ Frame: SomeComponent }}

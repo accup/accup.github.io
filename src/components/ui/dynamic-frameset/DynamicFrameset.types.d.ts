@@ -22,34 +22,4 @@ export type DynamicFramesetOrigin =
 /**
  * Frame identifier
  */
-export type DynamicFramesetFrameId = string;
-
-/**
- * State of the entire DynamicFrameset
- */
-export interface DynamicFramesetState {
-  /**
-   * Starting point of the DynamicFrameset flow.
-   */
-  readonly origin: DynamicFramesetOrigin;
-  /**
-   * Row tracks
-   */
-  readonly rowTracks: readonly DynamicFramesetTrackState[];
-  /**
-   * Column tracks
-   */
-  readonly columnTracks: readonly DynamicFramesetTrackState[];
-  /**
-   * Frames
-   */
-  readonly frames: readonly DynamicFramesetFrameState[];
-}
-
-/**
- * Mapping of frame properties
- */
-export type DynamicFramesetFramePropertyMap<TFrameComponentProps> = ReadonlyMap<
-  DynamicFramesetFrameId,
-  TFrameComponentProps
->;
+export type DynamicFramesetFrameKey = string;

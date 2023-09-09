@@ -49,35 +49,34 @@ export interface DynamicFramesetGridAreaConstraints {
   readonly maxColumnSize?: number | undefined;
 }
 
+export interface DynamicFramesetGridRect {
+  readonly rowSize: number;
+  readonly columnSize: number;
+  readonly insetRowStart: number;
+  readonly insetRowEnd: number;
+  readonly insetColumnStart: number;
+  readonly insetColumnEnd: number;
+}
+
 export interface UseDynamicFramesetGridKitProps {
-  readonly rowTracks: DynamicFramesetTracksKit;
-  readonly columnTracks: DynamicFramesetTracksKit;
+  readonly rowSideTracksKit: DynamicFramesetTracksKit;
+  readonly columnSideTracksKit: DynamicFramesetTracksKit;
 }
 
 export interface DynamicFramesetGridKit {
   /**
-   * Total size of all row tracks.
+   * Total size of all row tracks
    */
-  readonly totalRowSize: number;
+  readonly rowSideSize: number;
   /**
-   * Total size of all column tracks.
+   * Total size of all column tracks
    */
-  readonly totalColumnSize: number;
+  readonly columnSideSize: number;
 
   /**
    * Get the properties related to the size and position of a single grid track.
    */
-  getAreaRect(
-    this: void,
-    gridArea: DynamicFramesetGridArea,
-  ): {
-    readonly rowSize: number;
-    readonly columnSize: number;
-    readonly insetRowStart: number;
-    readonly insetRowEnd: number;
-    readonly insetColumnStart: number;
-    readonly insetColumnEnd: number;
-  };
+  getAreaRect(gridArea: DynamicFramesetGridArea): DynamicFramesetGridRect;
 }
 
 /**
@@ -86,10 +85,11 @@ export interface DynamicFramesetGridKit {
 export function useDynamicFramesetGrid(
   props: UseDynamicFramesetGridKitProps,
 ): DynamicFramesetGridKit {
-  const { rowTracks, columnTracks } = props;
+  const { rowSideTracksKit: rowTracks, columnSideTracksKit: columnTracks } =
+    props;
 
-  const rowSteps = useMemo(() => steps(rowTracks.state), [rowTracks]);
-  const columnSteps = useMemo(() => steps(columnTracks.state), [columnTracks]);
+  const rowSteps = useMemo(() => steps(rowTracks.tracks), [rowTracks]);
+  const columnSteps = useMemo(() => steps(columnTracks.tracks), [columnTracks]);
   const lastRowLine = useMemo(() => rowSteps.length - 1, [rowSteps]);
   const lastColumnLine = useMemo(() => columnSteps.length - 1, [columnSteps]);
 
@@ -140,8 +140,8 @@ export function useDynamicFramesetGrid(
   );
 
   return {
-    totalRowSize,
-    totalColumnSize,
+    rowSideSize: totalRowSize,
+    columnSideSize: totalColumnSize,
     getAreaRect,
   };
 }

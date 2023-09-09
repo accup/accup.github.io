@@ -22,10 +22,30 @@ export interface UseDynamicFramesetTracksKitProps {
 }
 
 export interface DynamicFramesetTracksKit {
-  readonly state: readonly DynamicFramesetTrackState[];
-  setState(tracks: readonly DynamicFramesetTrackState[]): void;
+  /**
+   * Track states
+   */
+  readonly tracks: readonly DynamicFramesetTrackState[];
+
+  /**
+   * Replace tracks.
+   */
+  replaceTracks(tracks: readonly DynamicFramesetTrackState[]): void;
+  /**
+   * Append a new track.
+   */
+  appendTrack(track: DynamicFramesetTrackState): void;
+  /**
+   * Insert a new track.
+   */
   insertTrack(index: number, track: DynamicFramesetTrackState): void;
+  /**
+   * Update a track.
+   */
   updateTrack(index: number, track: DynamicFramesetTrackState): void;
+  /**
+   * Remove a track.
+   */
   removeTrack(index: number): void;
 }
 
@@ -35,16 +55,18 @@ export function useDynamicFramesetTracksKit(
   const { initialize = [] } = props ?? {};
 
   const {
-    state,
-    setState,
+    items: tracks,
+    replaceItems: replaceTracks,
+    appendItem: appendTrack,
     insertItem: insertTrack,
     updateItem: updateTrack,
     removeItem: removeTrack,
   } = useArrayStateKit({ initialize });
 
   return {
-    state,
-    setState,
+    tracks,
+    replaceTracks,
+    appendTrack,
     insertTrack,
     updateTrack,
     removeTrack,

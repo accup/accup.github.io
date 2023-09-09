@@ -1,14 +1,18 @@
 import { useMemo, type CSSProperties, type ComponentType } from "react";
 
-import type { DynamicFramesetOrigin } from "./DynamicFrameset.types";
+import type {
+  DynamicFramesetFrameKey,
+  DynamicFramesetOrigin,
+} from "./DynamicFrameset.types";
 import type { DynamicFramesetFrameKit } from "./useDynamicFramesetFramesKit";
-import type { DynamicFramesetGridKit } from "./useDynamicFramesetGridKit";
-import type { DynamicFramesetOriginKit } from "./useDynamicFramesetOriginKit";
+import type { DynamicFramesetKit } from "./useDynamicFramesetKit";
 
-export interface DynamicFramesetFrameContainerProps<TFrameProps> {
-  readonly origin: DynamicFramesetOriginKit;
-  readonly grid: DynamicFramesetGridKit;
-  readonly frame: DynamicFramesetFrameKit<TFrameProps>;
+export interface DynamicFramesetFrameContainerProps<
+  K extends DynamicFramesetFrameKey,
+  TFrameProps,
+> {
+  readonly framesetKit: DynamicFramesetKit<K>;
+  readonly frameKit: DynamicFramesetFrameKit<K, TFrameProps>;
   readonly classes?: DynamicFramesetFrameContainerClasses | undefined;
   readonly slots?: DynamicFramesetFrameContainerSlots<TFrameProps> | undefined;
 }
@@ -27,23 +31,25 @@ export interface DynamicFramesetFrameContainerSlots<TFrameProps> {
 /**
  * Render the frame container and the frame with specific properties.
  */
-export function DynamicFramesetFrameContainer<TFrameProps>(
-  props: DynamicFramesetFrameContainerProps<TFrameProps>,
-) {
-  const { origin, grid, frame, classes, slots: { Frame } = {} } = props;
-  const { frameProps } = frame;
+export function DynamicFramesetFrameContainer<
+  K extends DynamicFramesetFrameKey,
+  TFrameProps,
+>(props: DynamicFramesetFrameContainerProps<K, TFrameProps>) {
+  const { framesetKit, frameKit, classes, slots: { Frame } = {} } = props;
+  const { origin, getGridAreaRect } = framesetKit;
+  const { frame, frameProps } = frameKit;
 
   const frameContainerStyle = useMemo<CSSProperties>(() => {
     const { rowSize, columnSize, insetRowStart, insetColumnStart } =
-      grid.getAreaRect(frame.state.gridArea);
+      getGridAreaRect(frame.gridArea);
 
     return {
       boxSizing: "border-box",
       position: "absolute",
-      ...getFrameRowStyles(origin.state, rowSize, insetRowStart),
-      ...getFrameColumnStyles(origin.state, columnSize, insetColumnStart),
+      ...getFrameRowStyles(origin, rowSize, insetRowStart),
+      ...getFrameColumnStyles(origin, columnSize, insetColumnStart),
     };
-  }, [origin, grid, frame]);
+  }, [origin, getGridAreaRect, frame]);
 
   return (
     <div className={classes?.frameContainer} style={frameContainerStyle}>

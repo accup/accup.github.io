@@ -6,8 +6,9 @@ export interface UseArrayStateKitProps<T> {
 }
 
 export interface ArrayStateKit<T> {
-  state: readonly T[];
-  setState(state: readonly T[]): void;
+  items: readonly T[];
+  replaceItems(state: readonly T[]): void;
+  appendItem(item: T): void;
   insertItem(index: number, item: T): void;
   updateItem(index: number, item: T): void;
   removeItem(index: number): void;
@@ -18,30 +19,37 @@ export function useArrayStateKit<T>(
 ): ArrayStateKit<T> {
   const { initialize = [] } = props ?? {};
 
-  const [state, setState] = useState(initialize);
+  const [items, replaceItems] = useState(initialize);
 
+  const appendItem = useCallback(
+    (item: T) => {
+      replaceItems((prevArray) => [...prevArray, item]);
+    },
+    [replaceItems],
+  );
   const insertItem = useCallback(
     (index: number, item: T) => {
-      setState((prevArray) => prevArray.toSpliced(index, 0, item));
+      replaceItems((prevArray) => prevArray.toSpliced(index, 0, item));
     },
-    [setState],
+    [replaceItems],
   );
   const updateItem = useCallback(
     (index: number, item: T) => {
-      setState((prevArray) => prevArray.toSpliced(index, 1, item));
+      replaceItems((prevArray) => prevArray.toSpliced(index, 1, item));
     },
-    [setState],
+    [replaceItems],
   );
   const removeItem = useCallback(
     (index: number) => {
-      setState((prevArray) => prevArray.toSpliced(index, 1));
+      replaceItems((prevArray) => prevArray.toSpliced(index, 1));
     },
-    [setState],
+    [replaceItems],
   );
 
   return {
-    state,
-    setState,
+    items,
+    replaceItems,
+    appendItem,
     insertItem,
     updateItem,
     removeItem,

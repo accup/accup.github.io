@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 export type InitializeState<T> = T | (() => T);
 
 function isCallableInitializer(
@@ -7,9 +9,13 @@ function isCallableInitializer(
 }
 
 export function useInitialState<T>(initializer: InitializeState<T>): T {
-  if (isCallableInitializer(initializer)) {
-    return initializer();
-  } else {
-    return initializer;
-  }
+  const initialState = useMemo(() => {
+    if (isCallableInitializer(initializer)) {
+      return initializer();
+    } else {
+      return initializer;
+    }
+  }, [initializer]);
+
+  return initialState;
 }

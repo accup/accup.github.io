@@ -6,7 +6,7 @@ import {
 } from "react";
 
 import type {
-  DynamicFramesetFramePropertyMap,
+  DynamicFramesetFrameKey,
   DynamicFramesetOrigin,
 } from "./DynamicFrameset.types";
 import {
@@ -17,13 +17,14 @@ import {
 } from "./DynamicFramesetFrameContainer";
 import type { DynamicFramesetKit } from "./useDynamicFramesetKit";
 
-export interface DynamicFramesetProps<TFrameProps> {
-  readonly frameset: DynamicFramesetKit;
-  readonly framePropsMap?:
-    | DynamicFramesetFramePropertyMap<TFrameProps>
-    | undefined;
+export interface DynamicFramesetProps<
+  K extends DynamicFramesetFrameKey,
+  TFrameProps,
+> {
+  readonly framesetKit: DynamicFramesetKit<K>;
+  readonly framePropsMap?: ReadonlyMap<K, TFrameProps> | undefined;
   readonly classes?: DynamicFramesetClasses | undefined;
-  readonly slots?: DynamicFramesetSlots<TFrameProps> | undefined;
+  readonly slots?: DynamicFramesetSlots<K, TFrameProps> | undefined;
 }
 
 export interface DynamicFramesetClasses
@@ -32,56 +33,60 @@ export interface DynamicFramesetClasses
   readonly thumb?: string | undefined;
 }
 
-export interface DynamicFramesetSlots<TFrameProps>
-  extends DynamicFramesetFrameContainerSlots<TFrameProps> {
+export interface DynamicFramesetSlots<
+  K extends DynamicFramesetFrameKey,
+  TFrameProps,
+> extends DynamicFramesetFrameContainerSlots<TFrameProps> {
   /**
    * Frame container
    */
   readonly FrameContainer?:
-    | ComponentType<DynamicFramesetFrameContainerProps<TFrameProps>>
+    | ComponentType<DynamicFramesetFrameContainerProps<K, TFrameProps>>
     | undefined;
 }
 
 /**
  * Render the same component with different properties in a grid layout.
  */
-export function DynamicFrameset<TFrameProps>(
-  props: DynamicFramesetProps<TFrameProps>,
+export function DynamicFrameset<K extends DynamicFramesetFrameKey, TFrameProps>(
+  props: DynamicFramesetProps<K, TFrameProps>,
 ): ReactNode {
-  const { frameset, framePropsMap, classes, slots } = props;
-  const { origin, grid, frames: framesKit } = frameset;
+  const {
+    framesetKit,
+    framePropsMap = new Map<K, TFrameProps>(),
+    classes,
+    slots,
+  } = props;
   const { FrameContainer = DynamicFramesetFrameContainer } = slots ?? {};
 
-  const frames = useMemo(
-    () => framesKit.getFrames(framePropsMap),
-    [framesKit, framePropsMap],
-  );
+  const { origin, useFrameKits, rowSideSize, columnSideSize } = framesetKit;
+
+  const frameKits = useFrameKits(framePropsMap);
 
   const rootStyle = useMemo<CSSProperties>(() => {
     return {
       display: "flow-root",
       isolation: "isolate",
       position: "relative",
-      ...getFramesetSizeStyles(
-        origin.state,
-        grid.totalRowSize,
-        grid.totalColumnSize,
-      ),
+      ...getFramesetSizeStyles(origin, rowSideSize, columnSideSize),
     };
-  }, [origin, grid]);
+  }, [origin, rowSideSize, columnSideSize]);
 
   return (
     <div className={classes?.root} style={rootStyle}>
-      {frames.map((frame) => (
-        <FrameContainer
-          key={frame.state.id}
-          origin={frameset.origin}
-          grid={frameset.grid}
-          frame={frame}
-          classes={classes}
-          slots={slots}
-        />
-      ))}
+      {frameKits.map((frameKit) => {
+        const { key } = frameKit;
+
+        return (
+          <FrameContainer
+            key={key}
+            framesetKit={framesetKit}
+            frameKit={frameKit}
+            classes={classes}
+            slots={slots}
+          />
+        );
+      })}
     </div>
   );
 }
