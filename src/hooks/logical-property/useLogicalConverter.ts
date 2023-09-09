@@ -29,7 +29,7 @@ type ConvertibleRecord<T> = {
 };
 type RecordConversion<
   TRecord extends ConvertibleRecord<unknown>,
-  TConvertibleKeyword extends ConvertibleKeyword
+  TConvertibleKeyword extends ConvertibleKeyword,
 > = TRecord extends Record<TConvertibleKeyword, unknown>
   ? {
       [K in LogicalConverterMap[keyof TRecord &
@@ -60,11 +60,11 @@ type ConvertedRecord<TRecord extends ConvertibleRecord<unknown>> = Omit<
   RecordConversion<TRecord, LogicalRectKeyword>;
 
 export type LogicalConverter = <TRecord extends ConvertibleRecord<unknown>>(
-  record: TRecord
+  record: TRecord,
 ) => ConvertedRecord<TRecord>;
 
 export function useLogicalConverter(
-  writingModes: Readonly<WritingModes>
+  writingModes: Readonly<WritingModes>,
 ): LogicalConverter {
   const logicalConverterMap = useMemo<LogicalConverterMap>(() => {
     const map: LogicalConverterMap = {
@@ -169,10 +169,10 @@ export function useLogicalConverter(
             ? logicalConverterMap[key as keyof LogicalConverterMap]
             : key,
           value,
-        ])
+        ]),
       ) as ConvertedRecord<TRecord>;
     },
-    [logicalConverterMap]
+    [logicalConverterMap],
   );
 
   return logicalConverter;

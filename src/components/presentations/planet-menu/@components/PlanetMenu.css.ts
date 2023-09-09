@@ -49,5 +49,5 @@ export const listItem = styleVariants(
       height: 250,
     },
     styleMap,
-  ]
+  ],
 );

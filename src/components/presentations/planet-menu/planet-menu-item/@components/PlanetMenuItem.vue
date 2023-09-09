@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-  IUniform,
+  type IUniform,
   Mesh,
   RawShaderMaterial,
   SphereGeometry,
@@ -40,11 +40,11 @@ function degToRad(degree: number): number {
 watchEffect(() => {
   const versionLessVertexShader = vertexShader.replace(
     RE_VERSION_DIRECTIVE,
-    ""
+    "",
   );
   const versionLessFragmentShader = props.fragmentShader.replace(
     RE_VERSION_DIRECTIVE,
-    ""
+    "",
   );
   const glslVersion = RE_VERSION_DIRECTIVE.exec(props.fragmentShader)?.groups
     ?.version;
@@ -71,9 +71,9 @@ const { refContainer } = useThreeAnimation({
       new Vector3().setFromSphericalCoords(
         1.0,
         degToRad(props.orbitalInclinationDegree + props.axialTiltDegree),
-        degToRad(90)
+        degToRad(90),
       ),
-      (1e-3 * animationTimeMs) / props.rotationPeriodDays
+      (1e-3 * animationTimeMs) / props.rotationPeriodDays,
     );
     uniforms.u_time.value = animationTimeMs;
   },

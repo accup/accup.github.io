@@ -1,8 +1,8 @@
 import { PerspectiveCamera, Scene, Vector2, WebGLRenderer } from "three";
-import { ShallowRef, shallowRef, watchEffect } from "vue";
+import { type ShallowRef, shallowRef, watchEffect } from "vue";
 
 import {
-  AnimationLoopCallbackProps,
+  type AnimationLoopCallbackProps,
   useAnimationLoop,
 } from "../animation-loop/useAnimationLoop";
 

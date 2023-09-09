@@ -21,6 +21,8 @@
   },
   "plugins": ["vue", "@typescript-eslint", "unused-imports"],
   "rules": {
+    "no-useless-rename": "error",
+    "object-shorthand": "error",
     "@typescript-eslint/no-unused-vars": "off",
     "react-hooks/exhaustive-deps": "error",
     "unused-imports/no-unused-imports": "warn",
@@ -46,6 +48,12 @@
     }
   },
   "overrides": [
+    {
+      "files": ["*.vue"],
+      "rules": {
+        "react-hooks/rules-of-hooks": "off"
+      }
+    },
     {
       "files": ["*.astro"],
       "parser": "astro-eslint-parser",

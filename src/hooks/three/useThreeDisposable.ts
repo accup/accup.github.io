@@ -1,4 +1,4 @@
-import { Ref, shallowReadonly, shallowRef, watchEffect } from "vue";
+import { type Ref, shallowReadonly, shallowRef, watchEffect } from "vue";
 
 interface Disposable {
   dispose(): void;
@@ -7,7 +7,7 @@ interface Disposable {
 type ThreeDisposableGetter<T extends Disposable> = () => T;
 
 export function useThreeDisposable<T extends Disposable>(
-  getter: ThreeDisposableGetter<T>
+  getter: ThreeDisposableGetter<T>,
 ): Readonly<Ref<T | undefined>> {
   const refResource = shallowRef<T>();
 

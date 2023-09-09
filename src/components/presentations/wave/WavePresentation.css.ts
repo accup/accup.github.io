@@ -18,7 +18,20 @@ export const root = style([
   {
     blockSize: ["100vh", "100vb", "100dvb"],
     inlineSize: ["100vw", "100vi", "100dvi"],
+  },
+  {
+    overflow: "hidden",
+  },
+  {
     color: theme.color.fg,
     backgroundColor: theme.color.bg,
+  },
+]);
+
+export const frameContainer = style([
+  {
+    border: `1px inset ${theme.color.bgSecondary}`,
+    transition: "0.3s ease-in-out",
+    transitionProperty: "inset, width, height, block-size, inline-size",
   },
 ]);

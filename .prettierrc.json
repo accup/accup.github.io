@@ -1,4 +1,5 @@
 {
+  "plugins": ["@trivago/prettier-plugin-sort-imports", "prettier-plugin-astro"],
   "overrides": [
     {
       "files": ["**/*.html"],
@@ -7,7 +8,7 @@
       }
     },
     {
-      "files": ["src/**/*.ts", "src/**/*.astro", "src/**/*.vue"],
+      "files": ["**/*.ts", "**/*.tsx", "**/*.astro", "**/*.vue"],
       "options": {
         "importOrderSeparation": true,
         "importOrderSortSpecifiers": true,

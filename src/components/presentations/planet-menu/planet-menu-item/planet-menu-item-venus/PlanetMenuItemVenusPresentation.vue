@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FactoryArg, InputMask } from "imask";
+import { type FactoryArg, InputMask } from "imask";
 import { ref, watchEffect } from "vue";
 
 import PlanetMenuItem from "../@components/PlanetMenuItem.vue";
