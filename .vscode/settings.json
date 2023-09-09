@@ -1,8 +1,9 @@
 {
   "[astro]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
-    },
+    "editor.codeActionsOnSave": [
+      "source.organizeImports",
+      "source.fixAll.eslint"
+    ],
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
@@ -16,16 +17,18 @@
     "editor.formatOnSave": true
   },
   "[javascript]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
-    },
+    "editor.codeActionsOnSave": [
+      "source.organizeImports",
+      "source.fixAll.eslint"
+    ],
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
   "[javascriptreact]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
-    },
+    "editor.codeActionsOnSave": [
+      "source.organizeImports",
+      "source.fixAll.eslint"
+    ],
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
@@ -38,23 +41,26 @@
     "editor.formatOnSave": true
   },
   "[typescript]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
-    },
+    "editor.codeActionsOnSave": [
+      "source.organizeImports",
+      "source.fixAll.eslint"
+    ],
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
   "[typescriptreact]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
-    },
+    "editor.codeActionsOnSave": [
+      "source.organizeImports",
+      "source.fixAll.eslint"
+    ],
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
   "[vue]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
-    },
+    "editor.codeActionsOnSave": [
+      "source.organizeImports",
+      "source.fixAll.eslint"
+    ],
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
