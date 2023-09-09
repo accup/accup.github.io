@@ -111,7 +111,7 @@ import * as classes from "./edit.astro.css";
       out.id = `foo-on-${tester.id}`;
 
       outputs.appendChild(
-        label([out, document.createTextNode(": Foo on "), ...tester.label()])
+        label([out, document.createTextNode(": Foo on "), ...tester.label()]),
       );
 
       tester.register(foo, out);
@@ -125,7 +125,7 @@ import * as classes from "./edit.astro.css";
       out.id = `bar-on-${tester.id}`;
 
       outputs.appendChild(
-        label([out, document.createTextNode(": Bar on "), ...tester.label()])
+        label([out, document.createTextNode(": Bar on "), ...tester.label()]),
       );
 
       tester.register(bar, out);
@@ -161,7 +161,7 @@ import * as classes from "./edit.astro.css";
           value=""
           autocomplete="off"
         />
-        (No autocomplete)
+         (No autocomplete)
       </label>
     </fieldset>
 

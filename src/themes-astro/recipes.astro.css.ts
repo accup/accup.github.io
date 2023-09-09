@@ -38,7 +38,7 @@ export const recipes = recipe({
           lineHeight: "06",
         },
       } as const,
-      (properties) => [fontSprinkles(properties)]
+      (properties) => [fontSprinkles(properties)],
     ),
     text: styleVariants(
       {
@@ -50,7 +50,7 @@ export const recipes = recipe({
         "error-01": { color: "error-01" },
         "success-01": { color: "success-01" },
       } as const,
-      (properties) => [colorSprinkles(properties)]
+      (properties) => [colorSprinkles(properties)],
     ),
     bg: styleVariants(
       {
@@ -62,7 +62,7 @@ export const recipes = recipe({
         "error-01": { backgroundColor: "error-01" },
         "success-01": { backgroundColor: "success-01" },
       } as const,
-      (properties) => [colorSprinkles(properties)]
+      (properties) => [colorSprinkles(properties)],
     ),
     flex: styleVariants(
       {
@@ -74,7 +74,7 @@ export const recipes = recipe({
           display: "flex",
         },
         styleMap,
-      ]
+      ],
     ),
     grid: {
       // solo grid recipes
@@ -90,7 +90,7 @@ export const recipes = recipe({
             gridTemplateRows: "minmax(0, 1fr)",
           },
           styleMap,
-        ]
+        ],
       ),
     },
     place: styleVariants({

@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+
 import type { InitializeState } from "./state";
 
 export interface UseArrayStateKitProps<T> {

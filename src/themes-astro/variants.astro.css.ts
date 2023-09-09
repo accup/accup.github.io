@@ -31,7 +31,7 @@ export const fontSprinkles = createSprinkles(
         "06": "14px",
       },
     },
-  })
+  }),
 );
 
 const colorVariants = {
@@ -74,5 +74,5 @@ export const colorSprinkles = createSprinkles(
         "outlineRightColor",
       ],
     },
-  })
+  }),
 );
